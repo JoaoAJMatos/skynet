@@ -12,7 +12,10 @@ set(CMAKE_CXX_EXTENSIONS OFF)
 set(INCLUDE_DIRS ${INCLUDE_DIRS} "${PROJECT_SOURCE_DIR}/src")
 include_directories(${INCLUDE_DIRS})
 
-add_executable(skynet main.cpp src/util.hpp src/types.hpp src/ntp.hpp src/ntp.cpp src/net/socket.cpp src/net/server.hpp src/net/server.cpp src/net/client.cpp)
+file(GLOB_RECURSE SOURCES "${PROJECT_SOURCE_DIR}/src/*.cpp")
+file(GLOB_RECURSE HEADERS "${PROJECT_SOURCE_DIR}/src/*.h")
+
+add_executable(${PROJECT_NAME} main.cpp ${SOURCES} ${HEADERS})
 
 if(WIN32)
     target_link_libraries(dev_dynamo wsock32 ws2_32)

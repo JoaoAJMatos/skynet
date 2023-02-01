@@ -13,7 +13,7 @@
 #include "libsecp256k1-config.h"
 #endif
 
-#include "../include/secp256k1.h"
+#include "../secp256k1.h"
 #include "assumptions.h"
 #include "util.h"
 #include "field_impl.h"
