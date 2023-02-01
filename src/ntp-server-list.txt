@@ -1,0 +1,16 @@
+time.google.com
+time.apple.com
+time.windows.com
+time.cloudflare.com
+time-a-g.nist.gov
+time-b-g.nist.gov
+time-c-g.nist.gov
+time-d-g.nist.gov
+time-a-wwv.nist.gov
+time-b-wwv.nist.gov
+time-c-wwv.nist.gov
+time-d-wwv.nist.gov
+time-a-b.nist.gov
+time-b-b.nist.gov
+time-c-b.nist.gov
+time-d-b.nist.gov
