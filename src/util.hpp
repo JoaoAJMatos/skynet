@@ -5,7 +5,7 @@
 #ifndef SKYNET_UTIL_HPP
 #define SKYNET_UTIL_HPP
 
-#include <assert.h>
+#include <cassert>
 #include <types.hpp>
 #include <iostream>
 

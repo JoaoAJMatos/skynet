@@ -6,7 +6,7 @@
 #include <stdio.h>
 
 #include "secp256k1.c"
-#include "../secp256k1.h"
+#include "../include/secp256k1.h"
 
 #include "assumptions.h"
 #include "util.h"

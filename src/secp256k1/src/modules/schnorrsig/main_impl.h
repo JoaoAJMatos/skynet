@@ -7,8 +7,8 @@
 #ifndef SECP256K1_MODULE_SCHNORRSIG_MAIN_H
 #define SECP256K1_MODULE_SCHNORRSIG_MAIN_H
 
-#include "secp256k1/secp256k1.h"
-#include "secp256k1/secp256k1_schnorrsig.h"
+#include "secp256k1/include/secp256k1.h"
+#include "secp256k1/include/secp256k1_schnorrsig.h"
 #include "../../hash.h"
 
 /* Initializes SHA256 with fixed midstate. This midstate was computed by applying

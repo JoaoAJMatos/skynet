@@ -17,12 +17,14 @@
 
 #include <types.hpp>
 #include <common.hpp>
-#include <secp256k1/secp256k1.h>
+#include <secp256k1/include/secp256k1.h>
+
+typedef secp256k1_ecdsa_signature ecdsa_signature_t;
 
 typedef struct {
     byte private_key[ECDSA_PRIVATE_KEY_LENGTH];
     byte public_key[ECDSA_COMPRESSED_PUBKEY_LENGTH];
-} ecdsa_keypair;
+} ecdsa_keypair_t;
 
 namespace crypto {
     class CEcdsa {
@@ -30,18 +32,13 @@ namespace crypto {
         CEcdsa();
         ~CEcdsa();
 
-        ErrorCode GenerateKeyPair(ecdsa_keypair *keypair);
-        ErrorCode Sign(byte *private_key, byte *hash, byte *signature);
+        ErrorCode GenerateKeyPair(ecdsa_keypair_t *keypair);
+        ErrorCode Sign(ecdsa_keypair_t *keypair, byte *hash, byte *signature_out);
         ErrorCode Verify(byte *public_key, byte *hash, byte *signature);
         ErrorCode PublicKeyFromPrivate(byte *private_key, byte *public_key);
-
-        void PrintKeyPair(ecdsa_keypair *keypair);
+        static void PrintKeyPair(ecdsa_keypair_t *keypair);
     private:
         secp256k1_context *ctx;
-
-    protected:
-        byte privkey[SHA256_DIGEST_LENGTH];
-        byte randomize[SHA256_DIGEST_LENGTH];
     };
 }
 
