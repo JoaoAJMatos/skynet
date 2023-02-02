@@ -46,7 +46,7 @@ static ErrorCode fill_random(unsigned char* data, size_t size) {
     }
 #elif defined(__APPLE__) || defined(__OpenBSD__)
     // If `getentropy(2)` is not available you should fallback to either /dev/urandom or `SecRandomCopyBytes`
-    int res = getentropy(data, size);
+    int res = getentropy(data, 32);
     if (res == 0) {
         return OK;
     } else {

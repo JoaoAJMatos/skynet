@@ -1,11 +1,13 @@
 #include <iostream>
 
-#include <net/client.hpp>
+#include <crypto/ecdsa/ecdsa.hpp>
 
 int main() {
-    net::CClient client(net::NET_TCP);
+    crypto::CEcdsa ecdsa = crypto::CEcdsa();
+    ecdsa_keypair_t keypair;
 
-    client.Connect("127.0.0.1", 3000);
-    client.Send("Hello World!", 12);
+    ecdsa.GenerateKeyPair(&keypair);
+    crypto::CEcdsa::PrintKeyPair(&keypair);
+
     return 0;
 }
