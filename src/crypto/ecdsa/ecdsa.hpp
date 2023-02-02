@@ -17,7 +17,7 @@
 
 #include <types.hpp>
 #include <common.hpp>
-#include <secp256k1/secp256k1.h>
+#include <secp256k1/include/secp256k1.h>
 
 typedef struct {
     byte private_key[ECDSA_PRIVATE_KEY_LENGTH];
@@ -34,8 +34,7 @@ namespace crypto {
         ErrorCode Sign(byte *private_key, byte *hash, byte *signature);
         ErrorCode Verify(byte *public_key, byte *hash, byte *signature);
         ErrorCode PublicKeyFromPrivate(byte *private_key, byte *public_key);
-
-        void PrintKeyPair(ecdsa_keypair *keypair);
+        static void PrintKeyPair(ecdsa_keypair *keypair);
     private:
         secp256k1_context *ctx;
 
