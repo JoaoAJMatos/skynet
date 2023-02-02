@@ -7,7 +7,7 @@
 #ifndef SECP256K1_MODULE_SCHNORRSIG_BENCH_H
 #define SECP256K1_MODULE_SCHNORRSIG_BENCH_H
 
-#include "secp256k1/secp256k1_schnorrsig.h"
+#include "secp256k1/include/secp256k1_schnorrsig.h"
 
 #define MSGLEN 32
 

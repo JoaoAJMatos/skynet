@@ -18,7 +18,7 @@
 #endif
 
 #include "secp256k1.c"
-#include "../secp256k1.h"
+#include "../include/secp256k1.h"
 #include "assumptions.h"
 #include "group.h"
 #include "testrand_impl.h"
