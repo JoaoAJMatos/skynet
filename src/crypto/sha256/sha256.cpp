@@ -89,6 +89,14 @@ crypto::CSHA256::CSHA256() {
     this->state[7] = 0x5be0cd19;
 }
 
+crypto::CSHA256::~CSHA256() {
+    memset(this->data, 0, 64);
+    memset(this->state, 0, 8);
+    this->data_size = 0;
+    this->bit_len = 0;
+}
+
+
 /**
  * @brief Updates the hash with the given data.
  * @param data The data to be hashed.

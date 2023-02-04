@@ -21,12 +21,13 @@
 #else
 #include <sys/socket.h>
 #include <netinet/in.h>
+#include <arpa/inet.h>
 #endif
 
 #include <unistd.h>
 #include <iostream>
 #include <fcntl.h>
-#include <arpa/inet.h>
+
 #include "common.hpp"
 
 namespace net {

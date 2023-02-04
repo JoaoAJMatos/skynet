@@ -92,23 +92,20 @@ crypto::CEcdsa::~CEcdsa() {
  * @return ErrorCode - OK if successful, ERROR otherwise
  */
 ErrorCode crypto::CEcdsa::GenerateKeyPair(ecdsa_keypair_t *keypair) {
-    secp256k1_pubkey pubkey;
     size_t pubkey_len;
-    byte privkey[SHA256_DIGEST_LENGTH];
 
     // If the secret key is 0 or bigger than sec256k1's order, we need to regenerate it.
     // The probability of this happening is negligible, but we still account for it.
     while (true) {
-        if (fill_random(privkey, sizeof(privkey)) != OK) return ERROR;
-        if (secp256k1_ec_seckey_verify(this->ctx, privkey) == 1) break;
+        if (fill_random(keypair->private_key, sizeof(keypair->private_key)) != OK) return ERROR;
+        if (secp256k1_ec_seckey_verify(this->ctx, keypair->private_key) == 1) break;
     }
 
-    if (secp256k1_ec_pubkey_create(this->ctx, &pubkey, privkey) != 1) return ERROR;
+    if (!secp256k1_ec_pubkey_create(this->ctx, &this->pubkey, keypair->private_key)) return ERROR;
 
     pubkey_len = sizeof(keypair->public_key);
-    if (secp256k1_ec_pubkey_serialize(this->ctx, keypair->public_key, &pubkey_len, &pubkey, SECP256K1_EC_COMPRESSED) != 1) return ERROR;
+    if (!secp256k1_ec_pubkey_serialize(this->ctx, keypair->public_key, &pubkey_len, &this->pubkey, SECP256K1_EC_COMPRESSED)) return ERROR;
     if (pubkey_len != sizeof(keypair->public_key)) return ERROR;
-    memcpy(keypair->private_key, privkey, sizeof(keypair->private_key));
     return OK;
 }
 
@@ -121,9 +118,8 @@ ErrorCode crypto::CEcdsa::GenerateKeyPair(ecdsa_keypair_t *keypair) {
  * @return ErrorCode - OK if successful, ERROR otherwise
  */
 ErrorCode crypto::CEcdsa::Sign(ecdsa_keypair_t *keypair, byte *hash, byte *signature_out) {
-    secp256k1_ecdsa_signature sig;
-    if (secp256k1_ecdsa_sign(this->ctx, &sig, hash, keypair->private_key, secp256k1_nonce_function_rfc6979, nullptr) != 1) return ERROR;
-    if (secp256k1_ecdsa_signature_serialize_compact(this->ctx, signature_out, &sig) != 1) return ERROR;
+    if (!secp256k1_ecdsa_sign(this->ctx, &this->sig, hash, keypair->private_key, nullptr, nullptr)) return ERROR;
+    if (!secp256k1_ecdsa_signature_serialize_compact(this->ctx, signature_out, &this->sig)) return ERROR;
     return OK;
 }
 
@@ -136,14 +132,21 @@ ErrorCode crypto::CEcdsa::Sign(ecdsa_keypair_t *keypair, byte *hash, byte *signa
  * @return ErrorCode - OK if the signature is valid, ERROR otherwise
  */
 ErrorCode crypto::CEcdsa::Verify(byte *public_key, byte *hash, byte *signature) {
-    secp256k1_ecdsa_signature sig;
-    secp256k1_pubkey pubkey;
+    // Deserialize the signature & public key
+    if (!secp256k1_ecdsa_signature_parse_compact(this->ctx, &this->sig, signature)) {
+        printf("Could not parse signature");
+        return ERROR;
+    }
 
-    // Deserialize the public key & signature
-    if (secp256k1_ec_pubkey_parse(this->ctx, &pubkey, public_key, sizeof(public_key)) != 1) return ERROR;
-    if (secp256k1_ecdsa_signature_parse_compact(this->ctx, &sig, signature) != 1) return ERROR;
+    if (!secp256k1_ec_pubkey_parse(this->ctx, &this->pubkey, public_key, sizeof(public_key))) {
+        printf("Could not parse public key\n");
+        return ERROR;
+    }
 
-    if (secp256k1_ecdsa_verify(this->ctx, &sig, hash, &pubkey) != 1) return ERROR;
+    if (!secp256k1_ecdsa_verify(this->ctx, &this->sig, hash, &this->pubkey)) {
+        printf("Invalid signature");
+        return ERROR;
+    }
     return OK;
 }
 
@@ -155,13 +158,12 @@ ErrorCode crypto::CEcdsa::Verify(byte *public_key, byte *hash, byte *signature) 
  * @return ErrorCode - OK if successful, ERROR otherwise
  */
 ErrorCode crypto::CEcdsa::PublicKeyFromPrivate(byte *private_key, byte *public_key) {
-    secp256k1_pubkey pubkey;
     size_t pubkey_len;
 
-    if (secp256k1_ec_pubkey_create(this->ctx, &pubkey, private_key) != 1) return ERROR;
+    if (secp256k1_ec_pubkey_create(this->ctx, &this->pubkey, private_key) != 1) return ERROR;
 
     pubkey_len = sizeof(public_key);
-    if (secp256k1_ec_pubkey_serialize(this->ctx, public_key, &pubkey_len, &pubkey, SECP256K1_EC_COMPRESSED) != 1) return ERROR;
+    if (secp256k1_ec_pubkey_serialize(this->ctx, public_key, &pubkey_len, &this->pubkey, SECP256K1_EC_COMPRESSED) != 1) return ERROR;
     if (pubkey_len != sizeof(public_key)) return ERROR;
     return OK;
 }

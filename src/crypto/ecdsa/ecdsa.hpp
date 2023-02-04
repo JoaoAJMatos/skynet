@@ -19,6 +19,8 @@
 #include <common.hpp>
 #include <secp256k1/include/secp256k1.h>
 
+#define ECDSA_SIGNATURE_LENGTH 64
+
 typedef secp256k1_ecdsa_signature ecdsa_signature_t;
 
 typedef struct {
@@ -39,6 +41,8 @@ namespace crypto {
         static void PrintKeyPair(ecdsa_keypair_t *keypair);
     private:
         secp256k1_context *ctx;
+        secp256k1_pubkey pubkey;
+        ecdsa_signature_t sig;
     };
 }
 
