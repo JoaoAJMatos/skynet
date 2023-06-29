@@ -2,9 +2,10 @@
 // Created by João Matos on 02/02/2023.
 //
 
-#include "sha256.hpp"
 
 #include <fstream>
+
+#include "sha256.hpp"
 
 #define ROTATE_LEFT(x, n) (((x) << (n)) | ((x) >> (32-(n))))
 #define ROTATE_RIGHT(x, n) (((x) >> (n)) | ((x) << (32-(n))))

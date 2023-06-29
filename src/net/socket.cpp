@@ -74,6 +74,22 @@ std::string net::Socket::GetRemoteAddress() const
       return std::string(ipstr);
 }
 
+int net::Socket::GetRemotePort() const
+{
+      struct sockaddr_in addr;
+      socklen_t addr_size = sizeof(struct sockaddr_in);
+      int res = getpeername(this->socket_, (struct sockaddr *)&addr, &addr_size);
+      if (res == -1) {
+            throw std::runtime_error("Failed to get peer name");
+      }
+      return ntohs(addr.sin_port);
+}
+
+int net::Socket::GetSocket() const
+{
+      return this->socket_;
+}
+
 
 // MIT License
 // 
