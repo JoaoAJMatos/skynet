@@ -2,42 +2,39 @@
 // Created by João Matos on 01/02/2023.
 //
 
+#include <cstring>
+#include <arpa/inet.h>
+
+#include "socket.hpp"
+
 #include "client.hpp"
 
-net::CClient::CClient(Protocol protocol) : CSocket(AF_INET, protocol == NET_TCP ? SOCK_STREAM : SOCK_DGRAM, 0) {}
 
-net::CClient::~CClient() = default;
+net::Client::Client(Protocol protocol) : Socket(AF_INET, protocol == net::Protocol::TCP ? SOCK_STREAM : SOCK_DGRAM, 0)
+{ }
 
-net::ErrorCode net::CClient::Connect(const char *host, int port) {
-    this->m_server_address.sin_family = AF_INET;
-    this->m_server_address.sin_port = htons(port);
-    this->m_server_address.sin_addr.s_addr = inet_addr(host);
-    memset(this->m_server_address.sin_zero, '\0', sizeof(this->m_server_address.sin_zero));
-    inet_pton(AF_INET, host, &this->m_server_address.sin_addr);
+int net::Client::Connect(const char *host, int port) 
+{
+      this->address_.sin_family = AF_INET;
+      this->address_.sin_port = htons(port);
+      this->address_.sin_addr.s_addr = inet_addr(host);
+      memset(this->address_.sin_zero, '\0', sizeof(this->address_.sin_zero));
+      inet_pton(AF_INET, host, &this->address_.sin_addr);
 
-    int result = connect(this->get_socket(), (struct sockaddr *) &this->m_server_address, sizeof(this->m_server_address));
-    if (result == NET_ERROR) {
-        return NET_ERROR;
-    }
-
-    return NET_OK;
+      int result = connect(this->GetSocket(), 
+                          (struct sockaddr *) &this->address_, sizeof(this->address_));
+      return result;
 }
 
-net::ErrorCode net::CClient::Send(const char *data, size_t size) {
-    int result = send(this->get_socket(), data, size, 0);
-    if (result == NET_ERROR) {
-        return NET_ERROR;
-    }
-
-    return NET_OK;
+int net::Client::Send(const char *data, size_t size) 
+{
+      int result = send(this->GetSocket(), data, size, 0);
+      return result;
 }
 
-net::ErrorCode net::CClient::Receive(char *buffer, size_t size) {
-    int result = recv(this->get_socket(), buffer, size, 0);
-    if (result == NET_ERROR) {
-        return NET_ERROR;
-    }
-
-    return NET_OK;
+int net::Client::Receive(char *buffer, size_t size) 
+{
+      int result = recv(this->GetSocket(), buffer, size, 0);
+      return result;
 }
 
