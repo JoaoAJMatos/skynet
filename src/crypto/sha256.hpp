@@ -33,6 +33,7 @@
 #include <types.hpp>
 #include <string>
 #include <array>
+#include <cstring>
 
 namespace crypto {
     class CSHA256 {
