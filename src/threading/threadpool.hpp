@@ -27,6 +27,7 @@
 #include <type_traits>
 #include <vector>
 #include <shared_mutex>
+#include <condition_variable>
 
 #include "blocking_queue.hpp"
 #include "mtx.hpp"

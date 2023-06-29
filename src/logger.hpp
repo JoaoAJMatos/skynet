@@ -36,23 +36,23 @@ namespace Logging
       };
 
 
-      inline void TRACE(const std::string& message) {
+      void TRACE(const std::string& message) {
             Logger::GetInstance()->Log(LogLevel::TRACE, message);
       }
 
-      inline void DEBUG(const std::string& message) {
+      void DEBUG(const std::string& message) {
             Logger::GetInstance()->Log(LogLevel::DEBUG, message);
       }
 
-      inline void INFO(const std::string& message) {
+      void INFO(const std::string& message) {
             Logger::GetInstance()->Log(LogLevel::INFO, message);
       }
 
-      inline void WARN(const std::string& message) {
+      void WARN(const std::string& message) {
             Logger::GetInstance()->Log(LogLevel::WARN, message);
       }
 
-      inline void ERROR(const std::string& message) {
+      void ERROR(const std::string& message) {
             Logger::GetInstance()->Log(LogLevel::ERROR, message);
       }
 }
