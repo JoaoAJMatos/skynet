@@ -14,10 +14,29 @@ For that reason, I decided to rewrite my own blockchain from scratch, but this t
 
 ## Features
 
-Skynet Core 
+Skynet Core is the foundation for the Skynet ecosystem. It contains all the core functionality of the Skynet network, including:
+
+- P2P Communication
+- Blockchain
+- Wallet
+- Transaction Pool
+- Mining
+- Consensus
 
 ## Building
 
 ```bash
 ./build.sh
 ```
+
+## Documentation
+
+You can find the documentation for Skynet Core [here]().
+
+## Contributing
+
+If you want to contribute to Skynet Core, please read the [contributing guidelines]().
+
+## License
+
+Skynet Core is licensed under the [MIT License](LICENSE.md).
