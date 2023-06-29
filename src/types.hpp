@@ -5,8 +5,6 @@
 #ifndef SKYNET_TYPES_HPP
 #define SKYNET_TYPES_HPP
 
-#define STD_BUFFER_SIZE 1024
-
 typedef unsigned char byte;
 typedef unsigned int  word;
 

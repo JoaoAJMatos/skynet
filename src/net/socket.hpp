@@ -13,43 +13,53 @@
 #ifndef SKYNET_SOCKET_HPP
 #define SKYNET_SOCKET_HPP
 
-#if defined(_WIN32)
-#include <winsock2.h>
-#include <ws2tcpip.h>
-#include <winerror.h>
-#include <tchar.h>
-#else
-#include <sys/socket.h>
-#include <netinet/in.h>
-#endif
+#include <string>
 
-#include <unistd.h>
-#include <iostream>
-#include <fcntl.h>
-#include <arpa/inet.h>
-#include "common.hpp"
+#include "net.hpp"
 
-namespace net {
-    class CSocket {
-    public:
-        CSocket(int domain, int type, int protocol = 0);
-        ~CSocket();
+namespace net 
+{
+      class Socket 
+      {
+      public:
+            Socket(int domain, int type, int protocol);
+            Socket(int domain, int type, Protocol protocol);
+            ~Socket();
 
-        void set_non_blocking(const bool non_blocking) const;
-        bool is_valid() const { return m_socket != NET_ERROR; }
+            void Close() const;
+            void SetNonBlocking(const bool flag) const;
+            int IsValid() const;
 
-        [[nodiscard]] int get_socket() const { return m_socket; }
-        char* get_last_error() const { return m_last_error; }
-
-    private:
-        int m_socket;
-        char* m_last_error{};
-
-#if defined(_WIN32)
-        WSAData m_wsa_data;
-#endif
-    };
-} // namespace net
+            std::string GetRemoteAddress() const;
+            int GetRemotePort() const;
+            [[nodiscard]] int GetSocket() const;
+      private:
+            int socket_;
+      };
+}
 
 
 #endif //SKYNET_SOCKET_HPP
+
+
+// MIT License
+// 
+// Copyright (c) 2023 João Matos
+// 
+// Permission is hereby granted, free of charge, to any person obtaining a copy
+// of this software and associated documentation files (the "Software"), to deal
+// in the Software without restriction, including without limitation the rights
+// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+// copies of the Software, and to permit persons to whom the Software is
+// furnished to do so, subject to the following conditions:
+// 
+// The above copyright notice and this permission notice shall be included in all
+// copies or substantial portions of the Software.
+// 
+// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+// SOFTWARE.

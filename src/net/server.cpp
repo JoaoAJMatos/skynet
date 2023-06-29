@@ -4,23 +4,23 @@
 
 #include "server.hpp"
 
-net::CServer::CServer(int port, Protocol protocol, int max_clients)
-             : CSocket(AF_INET, protocol == NET_TCP ? SOCK_STREAM : SOCK_DGRAM, 0)
+net::Server::Server(int port, Protocol protocol, int backlog) : Socket(AF_INET, 0, protocol)
 {
-    this->m_max_clients = max_clients;
-    this->m_server_address.sin_family = AF_INET;
-    this->m_server_address.sin_addr.s_addr = INADDR_ANY;
-    this->m_server_address.sin_port = htons(port);
+      this->backlog_ = backlog;
+      this->address_.sin_family = AF_INET;
+      this->address_.sin_addr.s_addr = INADDR_ANY;
+      this->address_.sin_port = htons(port);
 
-    int result = bind(this->get_socket(), (struct sockaddr *) &this->m_server_address, sizeof(this->m_server_address));
-    if (result == NET_ERROR) {
-        throw std::runtime_error("Failed to bind socket");
-    }
+      int result = bind(this->GetSocket(), 
+                       (struct sockaddr *) &this->address_, sizeof(this->address_));
 
-    if (protocol == NET_TCP) {
-        result = listen(this->get_socket(), this->m_max_clients);
-        if (result == NET_ERROR) {
+      if (result < 0) {
+            throw std::runtime_error("Failed to bind socket");
+      }
+
+      result = listen(this->GetSocket(), this->backlog_);
+
+      if (result < 0) {
             throw std::runtime_error("Failed to listen on socket");
-        }
-    }
+      }
 }

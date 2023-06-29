@@ -5,21 +5,22 @@
 #ifndef SKYNET_TCPCLIENT_HPP
 #define SKYNET_TCPCLIENT_HPP
 
-#include "common.hpp"
-#include "socket.hpp"
+#include <netinet/in.h>
 
-namespace net {
-    class CClient : public CSocket {
-    public:
-        CClient(Protocol protocol = NET_TCP);    // Protocol maps to the socket type
-        ~CClient();
+namespace net 
+{
+      class Client : public Socket 
+      {
+      public:
+            explicit Client(Protocol protocol = Protocol::TCP);
+            ~Client() = default;
 
-        ErrorCode Connect(const char *host, int port);
-        ErrorCode Send(const char *data, size_t size);
-        ErrorCode Receive(char *buffer, size_t size);
-    private:
-        sockaddr_in m_server_address;
-    };
-} // namespace Net
+            int Connect(const char *host, int port);
+            int Send(const char *data, size_t size);
+            int Receive(char *buffer, size_t size);
+      private:
+            sockaddr_in address_;
+      };
+}
 
 #endif //SKYNET_TCPCLIENT_HPP

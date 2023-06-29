@@ -9,10 +9,20 @@
 #include <types.hpp>
 #include <iostream>
 
-#define loop for (;;)
-#define array_size(array) (sizeof(array) / sizeof(array[0]))
-#define unimplemented() assert(false, "Unimplemented")
-#define timestamp() std::chrono::duration_cast<std::chrono::milliseconds> \
+#define ARRAY_SIZE(array) (sizeof(array) / sizeof(array[0]))
+
+#define ASSERT(condition, message) \
+    do { \
+        if (!(condition)) { \
+            std::cerr << "Assertion `" #condition "` failed in " << __FILE__ \
+                      << " line " << __LINE__ << ": " << message << std::endl; \
+            std::terminate(); \
+        } \
+    } while (false)
+
+#define UNIMPLEMENTED() ASSERT(false, "Unimplemented")
+
+#define TIMESTAMP() std::chrono::duration_cast<std::chrono::milliseconds> \
                     (std::chrono::system_clock::now().time_since_epoch()).count()
 
 
