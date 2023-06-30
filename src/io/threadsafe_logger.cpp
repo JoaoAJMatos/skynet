@@ -1,4 +1,4 @@
-#include "logger.hpp"
+#include "threadsafe_logger.hpp"
 
 Logging::Logger* Logging::Logger::m_instance_ = nullptr;
 
@@ -20,7 +20,7 @@ void Logging::Logger::SetLogFile(const std::string& filename)
 void Logging::Logger::Log(LogLevel level, const std::string& message)
 {
       std::lock_guard<std::mutex> lock(m_lock_);
-      std::string log_message = "[" + time_utils::GetFormattedTime() + "] " + message;
+      std::string log_message = "[" + skynet::time::datetime() + "] " + message;
       std::cout << log_message << std::endl;
       LogFile(level, log_message);
 }

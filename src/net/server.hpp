@@ -1,6 +1,11 @@
-//
-// Created by João Matos on 01/02/2023.
-//
+/**
+ * @file server.hpp
+ * @author JoaoAJMatos
+ * @brief Server abstraction
+ * @date 2023-06-30
+ * 
+ * @copyright Copyright (c) 2023
+ */
 
 #ifndef SKYNET_SERVER_HPP
 #define SKYNET_SERVER_HPP
