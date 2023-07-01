@@ -10,7 +10,12 @@
 #ifndef SKYNET_SERVER_HPP
 #define SKYNET_SERVER_HPP
 
+#if defined(_WIN32) || defined(_WIN64)
+#include <winsock2.h>
+#else
 #include <netinet/in.h>
+#endif // defined(_WIN32) || defined(_WIN64)
+
 #include <stdexcept>
 
 #include "socket.hpp"
@@ -28,10 +33,13 @@ namespace net
       private:
             sockaddr_in address_;
             int backlog_;
+		bool should_stop_;
 
+            /** VIRTUAL METHODS */
+            /** Launch must implement the server bootstrap procedure */
             virtual void Launch() = 0;
-            virtual void Accept() = 0;
-            virtual void Handle() = 0;
+            /** Accept should accept new connections */
+            virtual bool Accept() = 0;
       };
 }
 
