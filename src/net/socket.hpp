@@ -31,7 +31,7 @@ namespace net
             int IsValid() const;
 
             std::string GetRemoteAddress() const;
-            int GetRemotePort() const;
+            uint16_t GetRemotePort() const;
             [[nodiscard]] int GetSocket() const;
       private:
             int socket_;
