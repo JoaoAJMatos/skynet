@@ -5,8 +5,6 @@
 #include <cstring>
 #include <arpa/inet.h>
 
-#include "socket.hpp"
-
 #include "client.hpp"
 
 

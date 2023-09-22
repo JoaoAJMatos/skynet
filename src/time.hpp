@@ -1,26 +1,31 @@
 #ifndef SKYNET_TIME_HPP
+#define SKYNET_TIME_HPP
 
-namespace time_utils
+#include <chrono>
+#include <ctime>
+#include <string>
+
+namespace skynet::time
 {
-      std::string GetFormattedTime()
+      inline uint64_t timestamp()
       {
-            std::chrono::system_clock::time_point tp = std::chrono::system_clock::now();
-            std::time_t tt = std::chrono::system_clock::to_time_t(tp);
-            std::tm gmt{}; gmtime_r(&tt, &gmt);
-            std::chrono::duration<double> fractional_seconds =
-                  (tp - std::chrono::system_clock::from_time_t(tt)) + std::chrono::seconds(gmt.tm_sec);
+            return std::chrono::duration_cast<std::chrono::milliseconds> \
+                  (std::chrono::system_clock::now().time_since_epoch()).count();
+      }
 
-            std::string buffer("year/mo/dy hr:mn:sc.xxxxxx");
-            snprintf(&buffer.front(), buffer.size(),
-                  "%04d/%02d/%02d %02d:%02d:%09.6f",
-                  gmt.tm_year + 1900, gmt.tm_mon + 1,
-                  gmt.tm_mday, gmt.tm_hour, gmt.tm_min, fractional_seconds.count());
+      std::string timestamp_to_string(uint64_t timestamp)
+      {
+            std::time_t t = timestamp;
+            std::tm* tm = std::localtime(&t);
+            char buffer[80];
+            std::strftime(buffer, 80, "%Y-%m-%d %H:%M:%S", tm);
+            return std::string(buffer);
+      }
 
-            return buffer;
+      std::string datetime()
+      {
+            return timestamp_to_string(timestamp());
       }
 }
 
-#endif // !#ifndef SKYNET_TIME_HPP
-
-
-
+#endif // !SKYNET_TIME_HPP

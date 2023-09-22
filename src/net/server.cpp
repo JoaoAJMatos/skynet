@@ -14,13 +14,37 @@ net::Server::Server(int port, Protocol protocol, int backlog) : Socket(AF_INET, 
       int result = bind(this->GetSocket(), 
                        (struct sockaddr *) &this->address_, sizeof(this->address_));
 
-      if (result < 0) {
+      if (result < 0)
             throw std::runtime_error("Failed to bind socket");
-      }
 
       result = listen(this->GetSocket(), this->backlog_);
 
-      if (result < 0) {
+      if (result < 0)
             throw std::runtime_error("Failed to listen on socket");
-      }
+}
+
+net::Server::~Server()
+{
+	this->Stop();
+}
+
+/**
+ * @brief Starts the server loop.
+ *        The server loop and logic must be defined by
+ *        overriding the Launch and Accept methods.
+ */
+void net::Server::Run()
+{
+	this->Launch();
+	while (!this->should_stop_)
+	      this->Accept();
+}
+
+/**
+ * @brief Sets the should_stop flag to true.
+ *        Stops the server loop.
+ */
+void net::Server::Stop()
+{
+	this->should_stop_ = true;
 }

@@ -1,21 +1,16 @@
-/* ====================================================================== */ 
-//  
-//  @file    threadpool.hpp
-//  @brief   A thread pool implementation.
-//  @date    June 29, 2023
-// 
-//  @author  Liam0205, JoaoAJMatos
-//  @version 1.0
-//
-//  The original implementation by Liam0205 can be found at:
-//  - https://github.com/Liam0205/toy-threadpool
-// 
-//  @copyrigth (c) 2023 Liam0205, JoaoAJMatos
-//  @license Apache License 2.0, check the end of the file for extended
-//           copyright notice.
-//
-/* ====================================================================== */
-
+/**
+ * @file    threadpool.hpp
+ * @brief   A thread pool implementation.
+ * @date    June 29, 2023
+ * 
+ * The original implementation by Liam0205 can be found at:
+ * - https://github.com/Liam0205/toy-threadpool
+ * 
+ * @copyrigth (c) 2023 Liam0205, JoaoAJMatos
+ * @license Apache License 2.0, check the end of the file for extended
+ *          copyrigth notice.
+ * 
+ */
 
 #ifndef SKYNET_THREADPOOL_HPP
 #define SKYNET_THREADPOOL_HPP
@@ -32,14 +27,15 @@
 #include "blocking_queue.hpp"
 #include "mtx.hpp"
 
-#define DEFAULT_THREAD_COUNT std::thread::hardware_concurrency()
+/** Max thread count defaults to the number of logical cores. */
+#define MAX_THREAD_COUNT std::thread::hardware_concurrency()
 
 namespace threading
 {
       class ThreadPool
       {
       public:
-            ThreadPool(const size_t thread_count = DEFAULT_THREAD_COUNT);
+            ThreadPool(const size_t thread_count = MAX_THREAD_COUNT);
             ~ThreadPool();
 
             void Init();

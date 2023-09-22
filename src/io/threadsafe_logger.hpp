@@ -1,3 +1,12 @@
+/**
+ * @file threadsafe_logger.hpp
+ * @author JoaoAJMatos
+ * @brief A thread-safe logger for the stdout and files
+ * @date 2023-06-30
+ * 
+ * @copyright Copyright (c) 2023
+ */
+
 #ifndef SKYNET_LOGGER_HPP
 #define SKYNET_LOGGER_HPP
 
@@ -10,7 +19,14 @@
 
 namespace Logging 
 {
-      enum class LogLevel : uint8_t { TRACE = 0, DEBUG = 1, INFO = 2, WARN = 3, ERROR = 4 };
+      enum class LogLevel : uint8_t 
+      { 
+            TRACE = 0, 
+            DEBUG = 1, 
+            INFO = 2, 
+            WARN = 3, 
+            ERROR = 4 
+      };
 
       class Logger
       {
@@ -35,7 +51,7 @@ namespace Logging
             std::mutex m_lock_;
       };
 
-
+      /** These stand out in the code */
       void TRACE(const std::string& message) {
             Logger::GetInstance()->Log(LogLevel::TRACE, message);
       }

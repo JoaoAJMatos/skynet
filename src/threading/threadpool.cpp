@@ -1,6 +1,7 @@
 
 #include "threadpool.hpp"
 
+/** CONSTRUCTORS & DESTRUCTORS **/
 threading::ThreadPool::ThreadPool(const size_t thread_count)
 {
       this->thread_count_ = thread_count;
@@ -43,14 +44,14 @@ void threading::ThreadPool::Stop(const bool wait)
 }
 
 /**
- * @brief Spawn a thread to process tasks.
+ * @brief Spawns a Thread.
+ * @details This function is called by the thread pool to spawn a thread to process tasks.
  */
 void threading::ThreadPool::Spawn()
 {
       for (;;) {
             bool pop_result = false;
             std::function<void()> task;
-            
             {
                   LOCK_MUTEX_WRITE(mutex_);
                   condition_.wait(lock, [this, &pop_result, &task]() {
@@ -58,7 +59,6 @@ void threading::ThreadPool::Spawn()
                         return pop_result || !running_;
                   });
             }
-
             if (!pop_result) return;
             task();
       }

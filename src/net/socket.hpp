@@ -1,11 +1,9 @@
 /**
  * @file   socket.hpp
  * @author JoaoAJMatos
- *
- * @brief This header file contains the implementation of the Socket abstraction.
- *
- * @version 0.1
- * @date 2023-02-01
+ * @brief  Socket wrapper
+ * @date   2023-02-01
+ * 
  * @license MIT
  * @copyright Copyright (c) 2023
  */
@@ -31,7 +29,7 @@ namespace net
             int IsValid() const;
 
             std::string GetRemoteAddress() const;
-            int GetRemotePort() const;
+            uint16_t GetRemotePort() const;
             [[nodiscard]] int GetSocket() const;
       private:
             int socket_;
