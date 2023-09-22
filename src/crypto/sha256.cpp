@@ -2,7 +2,6 @@
 // Created by João Matos on 02/02/2023.
 //
 
-
 #include <fstream>
 
 #include "sha256.hpp"
@@ -77,7 +76,7 @@ static void sha256_transform(word *state, const byte* data) {
 /**
  * @brief Constructs a new SHA256 object and initializes the state.
  */
-crypto::CSHA256::CSHA256() {
+crypto::SHA256::SHA256() {
     this->data_size = 0;
     this->bit_len = 0;
     this->state[0] = 0x6a09e667;
@@ -90,7 +89,7 @@ crypto::CSHA256::CSHA256() {
     this->state[7] = 0x5be0cd19;
 }
 
-crypto::CSHA256::~CSHA256() {
+crypto::SHA256::~SHA256() {
     memset(this->data, 0, 64);
     memset(this->state, 0, 8);
     this->data_size = 0;
@@ -103,53 +102,52 @@ crypto::CSHA256::~CSHA256() {
  * @param data The data to be hashed.
  * @param len The length of the data.
  */
-void crypto::CSHA256::Update(const byte* input_data, size_t len) {
-    word i;
-
-    for (i = 0; i < len; ++i) {
-        this->data[this->data_size] = input_data[i];
-        this->data_size++;
-        if (this->data_size == 64) {
-            sha256_transform(this->state, this->data);
-            this->bit_len += 512;
-            this->data_size = 0;
-        }
-    }
+void crypto::SHA256::Update(const byte* input_data, size_t len) {
+      word i;
+      for (i = 0; i < len; ++i) {
+            this->data[this->data_size] = input_data[i];
+            this->data_size++;
+            if (this->data_size == 64) {
+                  sha256_transform(this->state, this->data);
+                  this->bit_len += 512;
+                  this->data_size = 0;
+            }
+      }
 }
 
 /**
  * @brief Finalizes the hash and sets the digest.
  */
-void crypto::CSHA256::Final(byte *hash) {
-     word i = this->data_size;
+void crypto::SHA256::Final(byte *hash) {
+      word i = this->data_size;
 
-     if (this->data_size < 56) {
-         this->data[i++] = 0x80;
-         while (i < 56) {
-             this->data[i++] = 0x00;
-         }
-     } else {
-         this->data[i++] = 0x80;
-         while (i < 64) {
-             this->data[i++] = 0x00;
-         }
-         sha256_transform(this->state, this->data);
-         memset(this->data, 0, 56);
-     }
+      if (this->data_size < 56) {
+            this->data[i++] = 0x80;
+            while (i < 56) {
+                  this->data[i++] = 0x00;
+            }
+      } else {
+            this->data[i++] = 0x80;
+            while (i < 64) {
+                  this->data[i++] = 0x00;
+            }
+            sha256_transform(this->state, this->data);
+            memset(this->data, 0, 56);
+      }
 
-     this->bit_len += this->data_size * 8;
-     this->data[63] = this->bit_len;
-     this->data[62] = this->bit_len >> 8;
-     this->data[61] = this->bit_len >> 16;
-     this->data[60] = this->bit_len >> 24;
-     this->data[59] = this->bit_len >> 32;
-     this->data[58] = this->bit_len >> 40;
-     this->data[57] = this->bit_len >> 48;
-     this->data[56] = this->bit_len >> 56;
-     sha256_transform(this->state, this->data);
+      this->bit_len += this->data_size * 8;
+      this->data[63] = this->bit_len;
+      this->data[62] = this->bit_len >> 8;
+      this->data[61] = this->bit_len >> 16;
+      this->data[60] = this->bit_len >> 24;
+      this->data[59] = this->bit_len >> 32;
+      this->data[58] = this->bit_len >> 40;
+      this->data[57] = this->bit_len >> 48;
+      this->data[56] = this->bit_len >> 56;
+      sha256_transform(this->state, this->data);
 
-     // Reverse the byte order since we are using little endian (SHA256 uses big endian).
-     for (i = 0; i < 4; ++i) {
+      // Reverse the byte order since we are using little endian (SHA256 uses big endian).
+      for (i = 0; i < 4; ++i) {
             hash[i] = (this->state[0] >> (24 - i * 8)) & 0x000000ff;
             hash[i + 4] = (this->state[1] >> (24 - i * 8)) & 0x000000ff;
             hash[i + 8] = (this->state[2] >> (24 - i * 8)) & 0x000000ff;
@@ -158,7 +156,7 @@ void crypto::CSHA256::Final(byte *hash) {
             hash[i + 20] = (this->state[5] >> (24 - i * 8)) & 0x000000ff;
             hash[i + 24] = (this->state[6] >> (24 - i * 8)) & 0x000000ff;
             hash[i + 28] = (this->state[7] >> (24 - i * 8)) & 0x000000ff;
-     }
+      }
 }
 
 /**
@@ -167,9 +165,11 @@ void crypto::CSHA256::Final(byte *hash) {
  * @param len
  * @param hash
  */
-void crypto::CSHA256::Hash(const byte *input_data, size_t len, byte *hash) {
-    Update(input_data, len);
-    Final(hash);
+void crypto::SHA256::Hash(const byte *input_data, size_t len, byte *hash) {
+      crypto::SHA256 sha256;
+      sha256.Update(input_data, len);
+      sha256.Final(hash);
+      memset(&sha256, 0, sizeof(crypto::SHA256));
 }
 
 /**
@@ -177,29 +177,50 @@ void crypto::CSHA256::Hash(const byte *input_data, size_t len, byte *hash) {
  * @param filename
  * @param hash
  */
-void crypto::CSHA256::HashFile(const std::string &filename, byte *hash) {
-    std::ifstream file(filename, std::ios::binary);
-    if (!file.is_open()) {
-        throw std::runtime_error("Could not open file.");
-    }
+static void crypto::SHA256::HashFile(const std::string &filename, byte *hash) {
+      crypto::SHA256 sha256;
+      byte buffer[1024];
+      std::ifstream file(filename, std::ios::binary);
+      
+      if (!file.is_open()) {
+            throw std::runtime_error("Could not open file.");
+      }
 
-    byte buffer[1024];
-    while (!file.eof()) {
-        file.read((char*)buffer, 1024);
-        Update(buffer, file.gcount());
-    }
+      while (!file.eof()) {
+            file.read((char*)buffer, 1024);
+            sha256.Update(buffer, file.gcount());
+      }
 
-    Final(hash);
-    file.close();
+      sha256.Final(hash);
+      file.close();
+      memset(&sha256, 0, sizeof(crypto::SHA256));
 }
+
+
+/**
+ * @brief Compares two hashes.
+ * @param hash1
+ * @param hash2
+ * @return True if the hashes are equal, false otherwise.
+ */
+bool crypto::SHA256::CompareHash(const byte *hash1, const byte *hash2) {
+      for (int i = 0; i < SHA256_HASH_LENGTH; i++) {
+            if (hash1[i] != hash2[i]) {
+                  return false;
+            }
+      }
+      return true;
+}
+
 
 /**
  * @brief Prints a hash to the stdout.
  * @param hash
  */
-void crypto::CSHA256::PrintHash(byte *hash) {
-    for (int i = 0; i < 32; i++) {
-        printf("%02x", hash[i]);
-    }
-    printf("\n");
+void crypto::SHA256::PrintHash(byte *hash) {
+      for (int i = 0; i < SHA256_HASH_LENGTH; i++) {
+            printf("%02x", hash[i]);
+      }
+      printf("\n");
 }
+
