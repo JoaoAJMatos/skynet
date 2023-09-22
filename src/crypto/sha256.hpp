@@ -46,13 +46,14 @@ public:
       SHA256();
       ~SHA256();
       
+      /* Hashes the given data and outputs the digest to byte *hash */
       static void Hash(const byte *data, size_t len, byte *hash);
+      /* Hashes the given file and outputs the digest to byte *hash */
       static void HashFile(const std::string &filename, byte *hash);
-
+      /* Compares two hashes, true if equal, false if not */
       static bool CompareHash(const byte *hash1, const byte *hash2);
+      /* Prints a hash to the stdout */
       static void PrintHash(byte *hash);
-
-      byte* GetDigest() { return this->data; }
 private:
       /* Private Functions */
       void Update(const byte *data, size_t len);
