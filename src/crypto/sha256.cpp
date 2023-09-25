@@ -2,22 +2,26 @@
 // Created by João Matos on 02/02/2023.
 //
 
+/* C++ includes */
 #include <fstream>
 
+/* Skynet includes */
 #include "sha256.hpp"
 
+/* Rotates a word to the left/right by n bits */
 #define ROTATE_LEFT(x, n) (((x) << (n)) | ((x) >> (32-(n))))
 #define ROTATE_RIGHT(x, n) (((x) >> (n)) | ((x) << (32-(n))))
 
+/* Ch, Maj, Sigma and Epsilon functions */
 #define CHOOSE(x, y, z) (((x) & (y)) ^ (~(x) & (z)))
 #define MAJORITY(x, y, z) (((x) & (y)) ^ ((x) & (z)) ^ ((y) & (z)))
-
 #define EPSILON_0(x) (ROTATE_RIGHT(x, 2) ^ ROTATE_RIGHT(x, 13) ^ ROTATE_RIGHT(x, 22))
 #define EPSILON_1(x) (ROTATE_RIGHT(x, 6) ^ ROTATE_RIGHT(x, 11) ^ ROTATE_RIGHT(x, 25))
 #define SIGMA_0(x) (ROTATE_RIGHT(x, 7) ^ ROTATE_RIGHT(x, 18) ^ ((x) >> 3))
 #define SIGMA_1(x) (ROTATE_RIGHT(x, 17) ^ ROTATE_RIGHT(x, 19) ^ ((x) >> 10))
 
-
+/* Constants */
+/* The first 32 bits of the fractional parts of the cube roots of the first 64 primes 2..311 */
 constexpr std::array<word, 64> K = {
         0x428a2f98,0x71374491,0xb5c0fbcf,0xe9b5dba5,0x3956c25b,0x59f111f1,0x923f82a4,0xab1c5ed5,
         0xd807aa98,0x12835b01,0x243185be,0x550c7dc3,0x72be5d74,0x80deb1fe,0x9bdc06a7,0xc19bf174,
@@ -181,7 +185,7 @@ static void crypto::SHA256::HashFile(const std::string &filename, byte *hash) {
       crypto::SHA256 sha256;
       byte buffer[1024];
       std::ifstream file(filename, std::ios::binary);
-      
+
       if (!file.is_open()) {
             throw std::runtime_error("Could not open file.");
       }
