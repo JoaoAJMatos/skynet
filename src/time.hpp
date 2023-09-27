@@ -5,16 +5,15 @@
 #include <ctime>
 #include <string>
 
+#include "macros.hpp"
+
 namespace skynet::time
 {
-      inline uint64_t timestamp()
-      {
-            return std::chrono::duration_cast<std::chrono::milliseconds> \
-                  (std::chrono::system_clock::now().time_since_epoch()).count();
+      inline uint64_t timestamp() {
+            return TIMESTAMP();
       }
 
-      std::string timestamp_to_string(uint64_t timestamp)
-      {
+      std::string timestamp_to_string(uint64_t timestamp) {
             std::time_t t = timestamp;
             std::tm* tm = std::localtime(&t);
             char buffer[80];
@@ -22,8 +21,7 @@ namespace skynet::time
             return std::string(buffer);
       }
 
-      std::string datetime()
-      {
+      std::string datetime() {
             return timestamp_to_string(timestamp());
       }
 }
