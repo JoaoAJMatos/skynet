@@ -94,8 +94,8 @@ crypto::SHA256::SHA256() {
 }
 
 crypto::SHA256::~SHA256() {
-    memset(this->data, 0, 64);
-    memset(this->state, 0, 8);
+    memset(this->data, 0, crypto::SHA256_BLOCK_SIZE);
+    memset(this->state, 0, crypto::SHA256_STATE_SIZE);
     this->data_size = 0;
     this->bit_len = 0;
 }
@@ -111,7 +111,7 @@ void crypto::SHA256::Update(const byte* input_data, size_t len) {
       for (i = 0; i < len; ++i) {
             this->data[this->data_size] = input_data[i];
             this->data_size++;
-            if (this->data_size == 64) {
+            if (this->data_size == crypto::SHA256_BLOCK_SIZE) {
                   sha256_transform(this->state, this->data);
                   this->bit_len += 512;
                   this->data_size = 0;
@@ -181,7 +181,7 @@ void crypto::SHA256::Hash(const byte *input_data, size_t len, byte *hash) {
  * @param filename
  * @param hash
  */
-static void crypto::SHA256::HashFile(const std::string &filename, byte *hash) {
+void crypto::SHA256::HashFile(const std::string &filename, byte *hash) {
       crypto::SHA256 sha256;
       byte buffer[1024];
       std::ifstream file(filename, std::ios::binary);
@@ -208,7 +208,7 @@ static void crypto::SHA256::HashFile(const std::string &filename, byte *hash) {
  * @return True if the hashes are equal, false otherwise.
  */
 bool crypto::SHA256::CompareHash(const byte *hash1, const byte *hash2) {
-      for (int i = 0; i < SHA256_HASH_LENGTH; i++) {
+      for (int i = 0; i < crypto::SHA256_HASH_SIZE; i++) {
             if (hash1[i] != hash2[i]) {
                   return false;
             }
@@ -222,9 +222,30 @@ bool crypto::SHA256::CompareHash(const byte *hash1, const byte *hash2) {
  * @param hash
  */
 void crypto::SHA256::PrintHash(byte *hash) {
-      for (int i = 0; i < SHA256_HASH_LENGTH; i++) {
+      for (int i = 0; i < crypto::SHA256_HASH_SIZE; i++) {
             printf("%02x", hash[i]);
       }
       printf("\n");
 }
 
+// MIT License
+// 
+// Copyright (c) 2023 João Matos
+// 
+// Permission is hereby granted, free of charge, to any person obtaining a copy
+// of this software and associated documentation files (the "Software"), to deal
+// in the Software without restriction, including without limitation the rights
+// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+// copies of the Software, and to permit persons to whom the Software is
+// furnished to do so, subject to the following conditions:
+// 
+// The above copyright notice and this permission notice shall be included in all
+// copies or substantial portions of the Software.
+// 
+// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+// SOFTWARE.

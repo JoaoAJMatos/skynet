@@ -35,36 +35,37 @@
 /* Skynet includes */
 #include <types.hpp>
 
-#define SHA256_HASH_LENGTH 32
-#define SHA256_BLOCK_SIZE 64
-
 namespace crypto 
 {
-class SHA256 
-{
-public:
-      SHA256();
-      ~SHA256();
-      
-      /** Hashes the given data and outputs the digest to byte *hash */
-      static void Hash(const byte *data, size_t len, byte *hash);
-      /** Hashes the given file and outputs the digest to byte *hash */
-      static void HashFile(const std::string &filename, byte *hash);
-      /** Compares two hashes, true if equal, false if not */
-      static bool CompareHash(const byte *hash1, const byte *hash2);
-      /** Prints a hash to the stdout */
-      static void PrintHash(byte *hash);
-private:
-      /* Private Functions */
-      void Update(const byte *data, size_t len);
-      void Final(byte *hash);
+      constexpr int SHA256_HASH_SIZE  = 32;
+      constexpr int SHA256_BLOCK_SIZE = 64;
+      constexpr int SHA256_STATE_SIZE = 8;
 
-      /* Member Variables */
-      byte data[SHA256_BLOCK_SIZE];
-      word data_size;
-      unsigned long long bit_len;
-      word state[8];
-};
+      class SHA256 
+      {
+      public:
+            SHA256();
+            ~SHA256();
+            
+            /** Hashes the given data and outputs the digest to byte *hash */
+            static void Hash(const byte *data, size_t len, byte *hash);
+            /** Hashes the given file and outputs the digest to byte *hash */
+            static void HashFile(const std::string &filename, byte *hash);
+            /** Compares two hashes, true if equal, false if not */
+            static bool CompareHash(const byte *hash1, const byte *hash2);
+            /** Prints a hash to the stdout */
+            static void PrintHash(byte *hash);
+      private:
+            /* Private Functions */
+            void Update(const byte *data, size_t len);
+            void Final(byte *hash);
+
+            /* Member Variables */
+            byte data[SHA256_BLOCK_SIZE];
+            word data_size;
+            unsigned long long bit_len;
+            word state[SHA256_STATE_SIZE];
+      };
 }
 
 #endif //SKYNET_SHA256_HPP
