@@ -10,8 +10,10 @@
 #ifndef SKYNET_TCPCLIENT_HPP
 #define SKYNET_TCPCLIENT_HPP
 
+/* C++ includes */
 #include <netinet/in.h>
 
+/* Local includes */
 #include "socket.hpp"
 
 namespace net 
@@ -22,8 +24,11 @@ namespace net
             explicit Client(Protocol protocol = Protocol::TCP);
             ~Client() = default;
 
+            /** Connect to the given host and port */
             int Connect(const char *host, int port);
+            /** Send data to the connected host */
             int Send(const char *data, size_t size);
+            /** Receive data from the connected host */
             int Receive(char *buffer, size_t size);
       private:
             sockaddr_in address_;

@@ -17,23 +17,30 @@
 
 namespace net 
 {
-      class Socket 
-      {
-      public:
-            Socket(int domain, int type, int protocol);
-            Socket(int domain, int type, Protocol protocol);
-            ~Socket();
+class Socket 
+{
+public:
+      Socket(int domain, int type, int protocol);
+      Socket(int domain, int type, Protocol protocol);
+      ~Socket();
 
-            void Close() const;
-            void SetNonBlocking(const bool flag) const;
-            int IsValid() const;
+      /** Closes the socket descriptor */
+      void Close() const;
+      /** Sets the socket to blocking/non-blocking */
+      void SetNonBlocking(const bool flag) const;
+      /** Checks if the socket descriptor is valid */
+      int IsValid() const;
 
-            std::string GetRemoteAddress() const;
-            uint16_t GetRemotePort() const;
-            [[nodiscard]] int GetSocket() const;
-      private:
-            int socket_;
-      };
+      /** Gets the IP address of the remote host */
+      std::string GetRemoteAddress() const;
+      /** Gets the port of the remote host */
+      uint16_t GetRemotePort() const;
+
+      /* Getters */
+      [[nodiscard]] int GetSocket() const;
+private:
+      int socket_;
+};
 }
 
 
