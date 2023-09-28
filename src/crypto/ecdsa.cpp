@@ -127,7 +127,6 @@ crypto::ECError crypto::ECDSA::GetCompressedPublicKey(byte* compressed_pubkey) {
  */
 crypto::ECError crypto::ECDSA::Sign(byte *hash, byte *signature) {
       secp256k1_ecdsa_signature sig;
-      size_t len = SIGNATURE_SIZE;
 
       /** Sign the hash */
       if (!secp256k1_ecdsa_sign(this->context_, &sig, hash, this->private_key_, nullptr, nullptr)) {
@@ -135,7 +134,7 @@ crypto::ECError crypto::ECDSA::Sign(byte *hash, byte *signature) {
       }
 
       /** Serialize the signature */
-      if (!secp256k1_ecdsa_signature_serialize_der(this->context_, signature, &len, &sig)) {
+      if (!secp256k1_ecdsa_signature_serialize_compact(this->context_, signature, &sig)) {
             return crypto::ECError::SERIALIZATION_ERROR;
       }
 
@@ -160,7 +159,7 @@ crypto::ECError crypto::ECDSA::Verify(byte *hash, byte *signature, byte *pubkey)
       }
 
       /** Parse the signature */
-      if (!secp256k1_ecdsa_signature_parse_der(this->context_, &sig, signature, SIGNATURE_SIZE)) {
+      if (!secp256k1_ecdsa_signature_parse_compact(this->context_, &sig, signature)) {
             return crypto::ECError::SIGNATURE_PARSE_ERROR;
       }
 

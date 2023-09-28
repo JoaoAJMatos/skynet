@@ -31,7 +31,7 @@ namespace crypto
       constexpr int RANDOMIZER_BUFFER_SIZE = 32;      // Used for randomizing the context
       constexpr int COMPRESSED_PUBLIC_KEY_SIZE = 33;  // Compressed key for sharing
       constexpr int SERIALIZED_SIGNATURE_SIZE = 64;   // Serialized signature size
-      constexpr int SIGNATURE_SIZE = 74;              // Signature size
+      constexpr int SIGNATURE_SIZE = 72;              // Signature size
 
       /** Return values for the ECDSA functions */
       enum ECError
