@@ -10,11 +10,13 @@
 #ifndef SKYNET_LOGGER_HPP
 #define SKYNET_LOGGER_HPP
 
+/** C++ includes */
 #include <string>
 #include <iostream>
 #include <fstream>
 #include <mutex>
 
+/** Local includes */
 #include "time.hpp"
 
 namespace Logging 
@@ -35,10 +37,14 @@ namespace Logging
             Logger(const Logger&) = delete;
             void operator = (const Logger&) = delete;
 
+            /** Get the singleton instance */
             static Logger* GetInstance();
+            /** Set the file to log the messages to */
             void SetLogFile(const std::string& filename);
-
+            
+            /** Log a message to the stdout */
             void Log(LogLevel level, const std::string& message);
+            /** Log a message to a file */
             void LogFile(LogLevel level, const std::string& message);
 
       private:
@@ -52,23 +58,23 @@ namespace Logging
       };
 
       /** These stand out in the code */
-      void TRACE(const std::string& message) {
+      inline void TRACE(const std::string& message) {
             Logger::GetInstance()->Log(LogLevel::TRACE, message);
       }
 
-      void DEBUG(const std::string& message) {
+      inline void DEBUG(const std::string& message) {
             Logger::GetInstance()->Log(LogLevel::DEBUG, message);
       }
 
-      void INFO(const std::string& message) {
+      inline void INFO(const std::string& message) {
             Logger::GetInstance()->Log(LogLevel::INFO, message);
       }
 
-      void WARN(const std::string& message) {
+      inline void WARN(const std::string& message) {
             Logger::GetInstance()->Log(LogLevel::WARN, message);
       }
 
-      void ERROR(const std::string& message) {
+      inline void ERROR(const std::string& message) {
             Logger::GetInstance()->Log(LogLevel::ERROR, message);
       }
 }
