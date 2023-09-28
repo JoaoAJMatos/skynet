@@ -2,6 +2,7 @@
 #include <crypto/ecdsa.hpp>
 #include <crypto/sha256.hpp>
 #include <crypto/util.hpp>
+#include <macros.hpp>
 
 /* Local includes */
 #include "unipp.hpp"
@@ -20,7 +21,7 @@ void EcdsaTest() {
       /** Sign the hash */
       crypto::SHA256::Hash(data, sizeof(data), hash);
       err = ecdsa.Sign(hash, signature);
-      show_bytes(signature, crypto::SIGNATURE_SIZE);
+      SHOW_BYTES(signature, crypto::SIGNATURE_SIZE);
       
       /** Verify the signature */
       ecdsa.GetCompressedPublicKey(public_key);

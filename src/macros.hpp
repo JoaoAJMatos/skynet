@@ -9,6 +9,13 @@
 #define TIMESTAMP() std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now().time_since_epoch()).count()
 #define loop() for (;;)
 
+#define SHOW_BYTES(bytes, size) \
+      for (int i = 0; i < size; i++) { \
+            printf("%02x", bytes[i]); \
+      } \
+      printf("\n");
+
+
 #ifdef __APPLE__
 #define inline __attribute__((always_inline))
 #endif // __APPLE__

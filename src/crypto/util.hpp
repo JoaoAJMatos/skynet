@@ -50,18 +50,6 @@ static void secure_memzero(void *ptr, size_t len) {
 #endif
 }
 
-/**
- * @brief Shows the bytes pointed by `bytes` with the given length
- *
- * @param bytes Pointer to the bytes to be displayed
- * @param len Length of the bytes to be displayed
- */
-void show_bytes(byte* bytes, size_t len) {
-      for (size_t i = 0; i < len; i++) {
-            printf("%02x", bytes[i]);
-      }
-      printf("\n");
-}
 
 #endif // !SKYNET_CRYPTO_MEMORY_HPP
 
