@@ -7,8 +7,9 @@
 
 int main(void) {
       RUN(
-            SUITE("Hashing Interface", "Tests Skynet's cryptography interface",
-                  TEST("Sha-256 Test", "Tests the SHA256 hash function", HashTest)
+            SUITE("Cryptography Interface", "Tests Skynet's cryptography interface",
+                  TEST("Sha-256 Test", "Tests the SHA256 hash function", HashTest),
+                  TEST("ECDSA Test", "Tests the ECDSA signature algorithm", EcdsaTest)
             )
       );
 

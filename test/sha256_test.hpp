@@ -5,8 +5,8 @@
 void HashTest() {
       byte data1[] = "Hello World!";
       byte data2[] = "Hello World Again!";
-      byte hash1[SHA256_HASH_LENGTH];
-      byte hash2[SHA256_HASH_LENGTH];
+      byte hash1[crypto::SHA256_HASH_SIZE];
+      byte hash2[crypto::SHA256_HASH_SIZE];
       
       crypto::SHA256::Hash(data1, sizeof(data1), hash1);
       crypto::SHA256::Hash(data2, sizeof(data2), hash2);
