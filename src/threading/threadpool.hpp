@@ -15,6 +15,8 @@
 #ifndef SKYNET_THREADPOOL_HPP
 #define SKYNET_THREADPOOL_HPP
 
+
+/* C++ includes */
 #include <functional>
 #include <future>
 #include <mutex>
@@ -24,11 +26,14 @@
 #include <shared_mutex>
 #include <condition_variable>
 
+/* Local includes */
 #include "blocking_queue.hpp"
 #include "mtx.hpp"
 
+
 /** Max thread count defaults to the number of logical cores. */
 #define MAX_THREAD_COUNT std::thread::hardware_concurrency()
+
 
 namespace threading
 {
@@ -38,18 +43,24 @@ namespace threading
             ThreadPool(const size_t thread_count = MAX_THREAD_COUNT);
             ~ThreadPool();
 
+            /** Initialize the thread pool. */
             void Init();
+            /** Stop the thread pool. */
             void Stop(bool force = false);
 
+            /** Enqueue a task to the thread pool. */
             template<class F, class... Args>
             auto Enqueue(F &&f, Args &&... args) const -> std::future<decltype(f(args...))>;
 
+            /* GETTERS */
             bool IsRunning() const; 
             size_t GetThreadCount() const;
             size_t GetTaskCount() const;
       private:
+            /** Spawn the worker threads. */
             void Spawn();
 
+            /* MEMBER VARIABLES */
             size_t thread_count_;
             bool running_;
             mutable std::shared_mutex mutex_;

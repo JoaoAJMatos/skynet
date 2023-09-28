@@ -1,37 +1,34 @@
-//
-// Created by João Matos on 01/02/2023.
-//
+/**
+ * @file   node.hpp
+ * @author JoaoAJMatos
+ *
+ * @brief This header file contains the logic for a Skynet node. It provides the interface
+ *        for the node to interact with the network and the blockchain.
+ *
+ * @version 0.1
+ * @date 2023-02-01
+ * @license MIT
+ * @copyright Copyright (c) 2023
+ */
 
-#include <cstring>
-#include <arpa/inet.h>
+/* Skynet Includes */
+#include <net/client.hpp>
+#include <net/server.hpp>
 
-#include "client.hpp"
+namespace skynet
+{
+class NodeServer : public net::Server
+{
+};
 
+class NodeClient : public net::Client
+{
+};
 
-net::Client::Client(Protocol protocol) : Socket(AF_INET, protocol == net::Protocol::TCP ? SOCK_STREAM : SOCK_DGRAM, 0)
-{ }
-
-int net::Client::Connect(const char *host, int port) {
-      this->address_.sin_family = AF_INET;
-      this->address_.sin_port = htons(port);
-      this->address_.sin_addr.s_addr = inet_addr(host);
-      memset(this->address_.sin_zero, '\0', sizeof(this->address_.sin_zero));
-      inet_pton(AF_INET, host, &this->address_.sin_addr);
-
-      int result = connect(this->GetSocket(), 
-                          (struct sockaddr *) &this->address_, sizeof(this->address_));
-      return result;
-}
-
-int net::Client::Send(const char *data, size_t size) {
-      int result = send(this->GetSocket(), data, size, 0);
-      return result;
-}
-
-int net::Client::Receive(char *buffer, size_t size) {
-      int result = recv(this->GetSocket(), buffer, size, 0);
-      return result;
-}
+class Node
+{
+};
+} // namespace skynet
 
 // MIT License
 // 

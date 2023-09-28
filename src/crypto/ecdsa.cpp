@@ -130,12 +130,12 @@ crypto::ECError crypto::ECDSA::Sign(byte *hash, byte *signature) {
       size_t len = SIGNATURE_SIZE;
 
       /** Sign the hash */
-      if (secp256k1_ecdsa_sign(this->context_, &sig, hash, this->private_key_, nullptr, nullptr) == 0) {
+      if (!secp256k1_ecdsa_sign(this->context_, &sig, hash, this->private_key_, nullptr, nullptr)) {
             return crypto::ECError::SIGNATURE_ERROR;
       }
 
       /** Serialize the signature */
-      if (secp256k1_ecdsa_signature_serialize_der(this->context_, signature, &len, &sig)) {
+      if (!secp256k1_ecdsa_signature_serialize_der(this->context_, signature, &len, &sig)) {
             return crypto::ECError::SERIALIZATION_ERROR;
       }
 
@@ -153,19 +153,21 @@ crypto::ECError crypto::ECDSA::Sign(byte *hash, byte *signature) {
 crypto::ECError crypto::ECDSA::Verify(byte *hash, byte *signature, byte *pubkey) {
       secp256k1_pubkey public_key;
       secp256k1_ecdsa_signature sig;
-      int ret;
 
       /** Parse the public key */
-      ret = secp256k1_ec_pubkey_parse(this->context_, &public_key, pubkey, COMPRESSED_PUBLIC_KEY_SIZE);
-      if (!ret) return crypto::ECError::PUBKEY_PARSE_ERROR;
+      if (!secp256k1_ec_pubkey_parse(this->context_, &public_key, pubkey, COMPRESSED_PUBLIC_KEY_SIZE)) {
+            return crypto::ECError::PUBKEY_PARSE_ERROR;
+      }
 
       /** Parse the signature */
-      ret = secp256k1_ecdsa_signature_parse_der(this->context_, &sig, signature, SIGNATURE_SIZE);
-      if (!ret) return crypto::ECError::SIGNATURE_PARSE_ERROR;
+      if (!secp256k1_ecdsa_signature_parse_der(this->context_, &sig, signature, SIGNATURE_SIZE)) {
+            return crypto::ECError::SIGNATURE_PARSE_ERROR;
+      }
 
       /** Verify the signature */
-      ret = secp256k1_ecdsa_verify(this->context_, &sig, hash, &public_key);
-      if (!ret) return crypto::ECError::SIGNATURE_INVALID;
+      if (!secp256k1_ecdsa_verify(this->context_, &sig, hash, &public_key)) {
+            return crypto::ECError::SIGNATURE_ERROR;
+      }
 
       return crypto::ECError::OK;
 }

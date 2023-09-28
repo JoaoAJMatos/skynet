@@ -1,9 +1,10 @@
 
 #include "threadpool.hpp"
 
+#include "../macros.hpp"
+
 /** CONSTRUCTORS & DESTRUCTORS **/
-threading::ThreadPool::ThreadPool(const size_t thread_count)
-{
+threading::ThreadPool::ThreadPool(const size_t thread_count) {
       this->thread_count_ = thread_count;
       this->running_ = false;
 }
@@ -14,8 +15,7 @@ inline threading::ThreadPool::~ThreadPool() { this->Stop(false); }
 /**
  * @brief Start the thread pool.
  */
-void threading::ThreadPool::Init()
-{
+void threading::ThreadPool::Init() {
       std::call_once(this->once_flag_, [this]() {
             LOCK_MUTEX_WRITE(this->mutex_);
             workers_.reserve(this->thread_count_);
@@ -30,8 +30,7 @@ void threading::ThreadPool::Init()
  * @param wait | true, stops and processes all delegated tasks.
  *             | false, stops and drops all delegated tasks.
  */
-void threading::ThreadPool::Stop(const bool wait)
-{
+void threading::ThreadPool::Stop(const bool wait) {
       if (!running_) return;
       running_ = false;
       if (!wait) {
@@ -47,9 +46,8 @@ void threading::ThreadPool::Stop(const bool wait)
  * @brief Spawns a Thread.
  * @details This function is called by the thread pool to spawn a thread to process tasks.
  */
-void threading::ThreadPool::Spawn()
-{
-      for (;;) {
+void threading::ThreadPool::Spawn() {
+      loop() {
             bool pop_result = false;
             std::function<void()> task;
             {
@@ -71,8 +69,7 @@ void threading::ThreadPool::Spawn()
  * @return std::future | The result of the function.
  */
 template <class F, class... Args>
-auto threading::ThreadPool::Enqueue(F &&f, Args &&... args) const -> std::future<decltype(f(args...))>
-{
+auto threading::ThreadPool::Enqueue(F &&f, Args &&... args) const -> std::future<decltype(f(args...))> {
       using return_type = decltype(f(args...));
       auto task = std::make_shared<std::packaged_task<return_type()>>(
             std::bind(std::forward<F>(f), std::forward<Args>(args)...));

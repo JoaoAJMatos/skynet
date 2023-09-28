@@ -23,6 +23,8 @@ Skynet Core is the foundation for the Skynet ecosystem. It contains all the core
 - Mining
 - Consensus
 
+Skynet Node GUI implements a graphical user interface for Skynet Core. It allows users to interact with the Skynet network, and to manage their wallets.
+
 ## Building
 
 ```bash

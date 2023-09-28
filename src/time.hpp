@@ -1,10 +1,12 @@
 #ifndef SKYNET_TIME_HPP
 #define SKYNET_TIME_HPP
 
+/* C++ includes */
 #include <chrono>
 #include <ctime>
 #include <string>
 
+/* Skynet includes */
 #include "macros.hpp"
 
 namespace skynet::time

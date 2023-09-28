@@ -32,29 +32,25 @@ namespace threading
             BlockingQueue() = default;          
             ~BlockingQueue() { Clear(); }
 
-            void Clear()
-            {
+            void Clear() {
                   LOCK_MUTEX_WRITE(mutex_);
                   while (!std::queue<T>::empty()) {
                         std::queue<T>::pop();
                   }
             }
 
-            void Push(const T& object)
-            {
+            void Push(const T& object) {
                   LOCK_MUTEX_WRITE(mutex_);
                   std::queue<T>::push(object);
             }
 
             template <typename... Args>
-            void Emplace(Args&&... args)
-            {
+            void Emplace(Args&&... args) {
                   LOCK_MUTEX_WRITE(mutex_);
                   std::queue<T>::emplace(std::forward<Args>(args)...);
             }
 
-            bool Pop(T& holder)
-            {
+            bool Pop(T& holder) {
                   LOCK_MUTEX_WRITE(mutex_);
                   if (std::queue<T>::empty()) {
                         return false;
@@ -65,14 +61,12 @@ namespace threading
                   return true;
             }
 
-            bool IsEmpty() const
-            {
+            bool IsEmpty() const {
                   LOCK_MUTEX_READ(mutex_);
                   return std::queue<T>::empty();
             }
 
-            size_t Size() const
-            {
+            size_t Size() const {
                   LOCK_MUTEX_READ(mutex_);
                   return std::queue<T>::size();
             }
