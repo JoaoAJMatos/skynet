@@ -22,8 +22,14 @@
 #include "unipp.hpp"
 
 
-
-
+/**
+ * This file tests the ECDSA interface.
+ *
+ * We hash the data, sign the hash and verify the signature, all
+ * while simulating the serialization and deserialization process
+ * of the signature and public key to ensure that the interface
+ * is working properly.
+ */
 void EcdsaTest() {
       byte data[] = "Hello World!";
       byte hash[crypto::SHA256_HASH_SIZE];

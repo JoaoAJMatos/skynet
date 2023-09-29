@@ -15,18 +15,28 @@
 /* Test Imports */
 #include "sha256_test.hpp"
 #include "ecdsa_test.hpp"
+#include "io_test.hpp"
 
 /* UNIPP test framework */
 #include "unipp.hpp"
 
 
-
-
+/**
+ * This is the entry point of the unit tests.
+ *
+ * Here is where all the tests are defined and run.
+ */
 int main(void) {
       RUN(
             SUITE("Cryptography Interface", "Tests Skynet's cryptography interface",
                   TEST("Sha-256 Test", "Tests the SHA256 hash function", HashTest),
                   TEST("ECDSA Test", "Tests the ECDSA signature algorithm", EcdsaTest)
+            ),
+            SUITE("Input/Output Interface", "Tests Skynet's I/O interface",
+                  TEST("Write to file", "Tests the filesystem interface for writing to files", WriteFileTest),
+                  TEST("Read from file", "Tests the filesystem interface for reading from files", ReadFileTest),
+                  TEST("Append to file", "Tests the filesystem interface for appending to files", AppendFileTest),
+                  TEST("Delete file", "Tests the filesystem interface for deleting files", DeleteFileTest)
             )
       );
 
