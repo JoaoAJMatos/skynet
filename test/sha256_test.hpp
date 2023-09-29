@@ -19,8 +19,12 @@
 #include "unipp.hpp"
 
 
-
-
+/**
+ * This file tests the SHA-256 interface.
+ *
+ * We hash two different data and compare the hashes to ensure
+ * that the interface is working properly.
+ */
 void HashTest() {
       byte data1[] = "Hello World!";
       byte data2[] = "Hello World Again!";
