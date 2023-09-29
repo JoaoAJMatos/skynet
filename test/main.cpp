@@ -11,6 +11,8 @@
  * @copyright Copyright (c) 2023
  */
 
+/* C++ includes */
+#include <io/stdout.hpp>
 
 /* Test Imports */
 #include "sha256_test.hpp"
@@ -27,6 +29,8 @@
  * Here is where all the tests are defined and run.
  */
 int main(void) {
+      io::stdout::WriteLine(COLORED(GREEN, "Running unit tests..."));
+
       RUN(
             SUITE("Cryptography Interface", "Tests Skynet's cryptography interface",
                   TEST("Sha-256 Test", "Tests the SHA256 hash function", HashTest),
