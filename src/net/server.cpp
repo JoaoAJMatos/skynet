@@ -5,18 +5,18 @@
 #include "server.hpp"
 
 net::Server::Server(int port, Protocol protocol, int backlog) : Socket(AF_INET, 0, protocol) {
-      this->backlog_ = backlog;
-      this->address_.sin_family = AF_INET;
-      this->address_.sin_addr.s_addr = INADDR_ANY;
-      this->address_.sin_port = htons(port);
+      this->backlog = backlog;
+      this->address.sin_family = AF_INET;
+      this->address.sin_addr.s_addr = INADDR_ANY;
+      this->address.sin_port = htons(port);
 
       int result = bind(this->GetSocket(), 
-                       (struct sockaddr *) &this->address_, sizeof(this->address_));
+                       (struct sockaddr *) &this->address, sizeof(this->address));
 
       if (result < 0)
             throw std::runtime_error("Failed to bind socket");
 
-      result = listen(this->GetSocket(), this->backlog_);
+      result = listen(this->GetSocket(), this->backlog);
 
       if (result < 0)
             throw std::runtime_error("Failed to listen on socket");
@@ -33,7 +33,7 @@ net::Server::~Server() {
  */
 void net::Server::Run() {
 	this->Launch();
-	while (!this->should_stop_)
+	while (!this->shouldStop)
 	      this->Accept();
 }
 
@@ -42,7 +42,7 @@ void net::Server::Run() {
  *        Stops the server loop.
  */
 void net::Server::Stop() {
-	this->should_stop_ = true;
+	this->shouldStop = true;
 }
 
 // MIT License

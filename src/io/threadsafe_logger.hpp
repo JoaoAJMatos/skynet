@@ -12,22 +12,15 @@
 
 /** C++ includes */
 #include <string>
-#include <iostream>
-#include <fstream>
-#include <mutex>
 
-/** Local includes */
-#include "time.hpp"
-
-namespace Logging 
+namespace io::logging 
 {
-      enum class LogLevel : uint8_t 
-      { 
-            TRACE = 0, 
-            DEBUG = 1, 
-            INFO = 2, 
-            WARN = 3, 
-            ERROR = 4 
+      enum class LogLevel : uint8_t {
+            TRACE = 0,
+            DEBUG = 1,
+            INFO = 2,
+            WARN = 3,
+            ERROR = 4,
       };
 
       class Logger
@@ -39,45 +32,34 @@ namespace Logging
 
             /** Get the singleton instance */
             static Logger* GetInstance();
-            /** Set the file to log the messages to */
-            void SetLogFile(const std::string& filename);
-            
-            /** Log a message to the stdout */
-            void Log(LogLevel level, const std::string& message);
-            /** Log a message to a file */
-            void LogFile(LogLevel level, const std::string& message);
-
-      private:
-            std::string m_filename;
-            LogLevel m_level;
-            std::ofstream m_file;
-
+            /** Log a message to the stdout and to a logfile */
+            void Log(LogLevel level, const std::string& message, const std::string& filename = "");
       protected:
-            static Logger* m_instance_;
-            std::mutex m_lock_;
+            static Logger* instance_;
+            std::mutex lock_;
       };
-
-      /** These stand out in the code */
-      inline void TRACE(const std::string& message) {
-            Logger::GetInstance()->Log(LogLevel::TRACE, message);
-      }
-
-      inline void DEBUG(const std::string& message) {
-            Logger::GetInstance()->Log(LogLevel::DEBUG, message);
-      }
-
-      inline void INFO(const std::string& message) {
-            Logger::GetInstance()->Log(LogLevel::INFO, message);
-      }
-
-      inline void WARN(const std::string& message) {
-            Logger::GetInstance()->Log(LogLevel::WARN, message);
-      }
-
-      inline void ERROR(const std::string& message) {
-            Logger::GetInstance()->Log(LogLevel::ERROR, message);
-      }
 }
 
 #endif //SKYNET_LOGGER_HPP
 
+// MIT License
+// 
+// Copyright (c) 2023 João Matos
+// 
+// Permission is hereby granted, free of charge, to any person obtaining a copy
+// of this software and associated documentation files (the "Software"), to deal
+// in the Software without restriction, including without limitation the rights
+// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+// copies of the Software, and to permit persons to whom the Software is
+// furnished to do so, subject to the following conditions:
+// 
+// The above copyright notice and this permission notice shall be included in all
+// copies or substantial portions of the Software.
+// 
+// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+// SOFTWARE.

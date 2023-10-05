@@ -2,6 +2,11 @@
 // Created by João Matos on 29/09/2023.
 //
 
+/** C++ includes */
+#include <iostream>
+#include <fstream>
+#include <sstream>
+
 /** Skynet includes */
 #include <io/file.hpp>
 
@@ -15,6 +20,23 @@
         filename + " at line " + std::to_string(lineNumber) + " near: " + line);
 
 
+/** HELPER FUNCTIONS */
+/**
+ * @brief Trim leading and trailing whitespaces
+ *
+ * @param str
+ * @return std::string 
+ */
+std::string trim(const std::string& str) {
+      size_t first = str.find_first_not_of(' ');
+      if (std::string::npos == first) {
+            return str;
+      }
+      size_t last = str.find_last_not_of(' ');
+      return str.substr(first, (last - first + 1));
+}
+
+
 /**
  * @brief Saves the given configuration into a file
  *
@@ -23,7 +45,7 @@
  * @return true on success, false otherwise
  */
 bool io::config::Save(const std::string& filename, const ConfigMap& config) {
-      std:string content;
+      std::string content;
       for (auto& [key, value] : config) {
             content += key + "=" + value + "\n";
       }
@@ -38,7 +60,8 @@ bool io::config::Save(const std::string& filename, const ConfigMap& config) {
  */
 ConfigMap io::config::Load(const std::string& filename) {
       ConfigMap config;
-      std::string content = io::file::Read(filename);
+      std::string content;     
+      io::file::Read(filename, content);
       std::istringstream iss(content);
 
       std::string line;

@@ -11,36 +11,39 @@
 #ifndef SKYNET_SOCKET_HPP
 #define SKYNET_SOCKET_HPP
 
+/** C++ includes */
 #include <string>
 
+/** Local includes */
 #include "net.hpp"
+
 
 namespace net 
 {
-class Socket 
-{
-public:
-      Socket(int domain, int type, int protocol);
-      Socket(int domain, int type, Protocol protocol);
-      ~Socket();
+      class Socket 
+      {
+      public:
+            Socket(int domain, int type, int protocol);
+            Socket(int domain, int type, Protocol protocol);
+            ~Socket();
 
-      /** Closes the socket descriptor */
-      void Close() const;
-      /** Sets the socket to blocking/non-blocking */
-      void SetNonBlocking(const bool flag) const;
-      /** Checks if the socket descriptor is valid */
-      int IsValid() const;
+            /** Closes the socket descriptor */
+            void Close() const;
+            /** Sets the socket to blocking/non-blocking */
+            void SetNonBlocking(const bool flag) const;
+            /** Checks if the socket descriptor is valid */
+            int IsValid() const;
 
-      /** Gets the IP address of the remote host */
-      std::string GetRemoteAddress() const;
-      /** Gets the port of the remote host */
-      uint16_t GetRemotePort() const;
+            /** Gets the IP address of the remote host */
+            std::string GetRemoteAddress() const;
+            /** Gets the port of the remote host */
+            uint16_t GetRemotePort() const;
 
-      /* Getters */
-      [[nodiscard]] int GetSocket() const;
-private:
-      int socket_;
-};
+            /* Getters */
+            [[nodiscard]] int GetSocket() const;
+      private:
+            int socket_;
+      };
 }
 
 

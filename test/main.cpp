@@ -3,7 +3,6 @@
  * @author JoaoAJMatos
  *
  * @brief Entry point of the unit tests
- *	    
  *
  * @version 0.1
  * @date 2023-02-01
@@ -11,7 +10,7 @@
  * @copyright Copyright (c) 2023
  */
 
-/* C++ includes */
+/* Skynet includes */
 #include <io/stdout.hpp>
 
 /* Test Imports */
@@ -21,7 +20,6 @@
 
 /* UNIPP test framework */
 #include "unipp.hpp"
-
 
 /**
  * This is the entry point of the unit tests.
@@ -40,7 +38,9 @@ int main(void) {
                   TEST("Write to file", "Tests the filesystem interface for writing to files", WriteFileTest),
                   TEST("Read from file", "Tests the filesystem interface for reading from files", ReadFileTest),
                   TEST("Append to file", "Tests the filesystem interface for appending to files", AppendFileTest),
-                  TEST("Delete file", "Tests the filesystem interface for deleting files", DeleteFileTest)
+                  TEST("Delete file", "Tests the filesystem interface for deleting files", DeleteFileTest),
+                  TEST("Save Config", "Tests the config parser for saving config files", ConfigParserSaveTest),
+                  TEST("Load Config", "Tests the config parser for loading config files", ConfigParserLoadTest)
             )
       );
 

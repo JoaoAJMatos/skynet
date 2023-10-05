@@ -10,36 +10,52 @@
 #ifndef SKYNET_SERVER_HPP
 #define SKYNET_SERVER_HPP
 
+/** C++ includes */
+#include <stdexcept>
 #if defined(_WIN32) || defined(_WIN64)
 #include <winsock2.h>
 #else
 #include <netinet/in.h>
 #endif // defined(_WIN32) || defined(_WIN64)
 
-#include <stdexcept>
-
+/** Local includes */
 #include "socket.hpp"
+
 
 namespace net
 {
+      /** Default backlog size */
+      constexpr int DEFAULT_BACKLOG = 10;
+
       class Server : public Socket 
       {
       public:
-            Server(int port, Protocol protocol = Protocol::TCP, int backlog = 10);
+            Server(int port, Protocol protocol = Protocol::TCP, int backlog = DEFAULT_BACKLOG);
             ~Server();
-            
+
+            /** Starts the server loop */
             void Run();
+            /** Stops the server loop */
             void Stop();
+
+            /** Getters */
+            [[nodiscard]] int GetPort() const;
+            [[nodiscard]] int GetBacklog() const;
+
+            /** Setters */
+            void SetPort(int port);
+            void SetBacklog(int backlog);
       private:
-            sockaddr_in address_;
-            int backlog_;
-		bool should_stop_;
+            sockaddr_in address;
+            int backlog;
 
             /** VIRTUAL METHODS */
             /** Launch must implement the server bootstrap procedure */
             virtual void Launch() = 0;
             /** Accept should accept new connections */
             virtual bool Accept() = 0;
+      protected:
+		bool shouldStop;
       };
 }
 

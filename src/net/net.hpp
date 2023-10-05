@@ -1,22 +1,25 @@
+/**
+ * @file   net.hpp
+ * @author JoaoAJMatos
+ *
+ * @brief Some utilities for networking and general network constants
+ *	    
+ *
+ * @version 0.1
+ * @date 2023-02-01
+ * @license MIT
+ * @copyright Copyright (c) 2023
+ */
+
 #ifndef SKYNET_NET_HPP
 #define SKYNET_NET_HPP
-
-/** C++ headers */
-#include <cstdlib>
-#include <ctime>
-#include <sys/socket.h>
-#include <netinet/in.h>
-#include <arpa/inet.h>
-#include <unistd.h>
-
 
 namespace net 
 {
       /** Default network buffer size */
       constexpr int NET_BUFFER_SIZE = 1024;
 
-      enum class Protocol 
-      {
+      enum class Protocol {
             TCP = 1,
             UDP = 2,
       };
