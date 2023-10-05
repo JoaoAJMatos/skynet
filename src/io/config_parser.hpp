@@ -11,17 +11,18 @@
 #define IO_CONFIG_PARSER_HPP
 
 /** C++ includes */
-#include <map>
+#include <string>
 
-/** Local includes */
-#include "file.hpp"
 
+/** Skynet includes */
+#include <io/file.hpp>
+#include <util/map.hpp>
 
 /** Configuration map */
-typedef std::map<std::string, std::string> ConfigMap;
+using ConfigMap = util::Map<std::string, std::string>;
 
 namespace io::config
-{
+{      
       /** Saves the given configuration into a file */
       bool Save(const std::string& filename, const ConfigMap& config);
       /** Loads the given configuration from a file */
@@ -29,6 +30,7 @@ namespace io::config
 }
 
 #endif // IO_CONFIG_PARSER_HPP
+
 
 // MIT License
 // 

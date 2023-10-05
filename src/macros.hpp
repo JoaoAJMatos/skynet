@@ -20,8 +20,11 @@
 #define inline __attribute__((always_inline))
 #endif // __APPLE__
 
-#define ARRAY_SIZE(array) (sizeof(array) / sizeof(array[0]))
+#ifndef UNIPP
 #define ASSERT(condition, message) assert((condition) && (message))
+#endif
+
+#define ARRAY_SIZE(array) (sizeof(array) / sizeof(array[0]))
 #define UNIMPLEMENTED() ASSERT(false, "Unimplemented")
 #define TIMESTAMP() std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now().time_since_epoch()).count()
 #define loop() for (;;)

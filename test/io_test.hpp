@@ -12,11 +12,17 @@
 
 /** Skynet includes */
 #include <io/file.hpp>
+#include <io/config_parser.hpp>
+
 
 /** Helper functions */
 static bool StringsEqual(const std::string& a, const std::string& b) {
       return a.compare(b) == 0;
 }
+
+/** 
+ * Creates a config file for testing the config parser.
+ */
 
 /**
  * Write to a file. (must be called first in order for the other tests to work)
@@ -71,6 +77,28 @@ void DeleteFileTest() {
       std::string filename = "test.txt";
       io::file::Delete(filename);
       ASSERT_EQUAL(io::file::Exists(filename), false, "Failed to delete file");
+}
+
+/**
+ * Saves the given config map into a file.
+ */
+void ConfigParserSaveTest() {
+      ConfigMap config;
+      config["key1"] = "value1";
+      config["key2"] = "value2";
+      config["key3"] = "value3";
+      ASSERT_EQUAL(io::config::Save("test.cfg", config), true, "Failed to save config");
+}
+
+/**
+ * Loads the config file created in the previous test.
+ */
+void ConfigParserLoadTest() {
+      ConfigMap config = io::config::Load("test.cfg");
+      ASSERT_EQUAL(config["key1"], "value1", "Failed to load config");
+      ASSERT_EQUAL(config["key2"], "value2", "Failed to load config");
+      ASSERT_EQUAL(config["key3"], "value3", "Failed to load config");
+      io::file::Delete("test.cfg");
 }
 
 // MIT License

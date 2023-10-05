@@ -10,17 +10,23 @@
 #ifndef SKYNET_STDOUT_HPP
 #define SKYNET_STDOUT_HPP
 
+#include <iostream>
+
 /** Macros */
 /** Basic colors for the stdout */
 #ifdef _WIN32
 #define RED "\033[31m"
 #define GREEN "\033[32m"
 #define YELLOW "\033[33m"
+#define GRAY "\033[37m"
+#define BLUE "\033[34m"
 #define RESET "\033[0m"
 #else
 #define RED "\033[0;31m"
 #define GREEN "\033[0;32m"
 #define YELLOW "\033[0;33m"
+#define GRAY "\033[0;37m"
+#define BLUE "\033[0;34m"
 #define RESET "\033[0m"
 #endif // _WIN32
 

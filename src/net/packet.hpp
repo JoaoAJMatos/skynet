@@ -1,5 +1,20 @@
+/**
+ * @file   packet.hpp
+ * @author JoaoAJMatos
+ *
+ * @brief This file defines the structure of a packet
+ *        on the Skynet network.
+ *	    
+ *
+ * @version 0.1
+ * @date 2023-02-01
+ * @license MIT
+ * @copyright Copyright (c) 2023
+ */
+
 #ifndef SKYNET_PACKET_HPP
 #define SKYNET_PACKET_HPP
+
 
 /** C++ headers */
 #include <cstdint>
@@ -7,26 +22,26 @@
 /** Skynet headers */
 #include <types.hpp>
 
+
 namespace net::packet
 {
       /** Packet constants */
-	constexpr uint16_t MAX_PACKET_SIZE = 65535;
-	constexpr uint16_t MAX_PACKET_DATA_SIZE = MAX_PACKET_SIZE - sizeof(SHeaders_t);
+	constexpr uint16_t MAX_SIZE = 65535;
+	constexpr uint16_t MAX_DATA_SIZE = MAX_SIZE - sizeof(header_t);
 
 	/** Packet type = 1 byte (max 256 packet types) */
-	enum class Type : uint8_t
-	{
-		Empty = 0,
-		Ack = 1,
-		Data = 2,
+	enum class Type : uint8_t {
+		EMPTY = 0,
+		ACK = 1,
+		DATA = 2,
 	};
 
 	/** Packet headers */
-	typedef struct SHeaders {
+	typedef struct Header {
 		Type type;
 		uint16_t size;
 		uint16_t id;
-	} SHeaders_t;
+	} header_t;
 
 	
 	class Packet
@@ -35,7 +50,7 @@ namespace net::packet
 		Packet();
 		Packet(Type type);
 		~Packet();
-
+            
             /** Serialize the packet to a byte array */
 		byte* Serialize() const;
             /** Deserialize the given byte array to a packet */
@@ -55,8 +70,8 @@ namespace net::packet
 		void SetType(Type type);
 		void SetId(uint16_t id);
 	private:
-		SHeaders_t headers_;
-		byte data_[MAX_PACKET_DATA_SIZE];
+		header_t header_;
+		byte data_[MAX_DATA_SIZE];
 	};
 }
 

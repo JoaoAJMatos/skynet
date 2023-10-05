@@ -18,6 +18,7 @@
 #ifndef UNIPP_TEST_FRAMEWORK_HPP
 #define UNIPP_TEST_FRAMEWORK_HPP
 
+#define UNIPP 1
 
 /** C++ headers */
 #include <iostream>

@@ -10,6 +10,9 @@
 #ifndef IO_FILE_HPP
 #define IO_FILE_HPP
 
+/** C++ includes */
+#include <string>
+
 /** Skynet includes */
 #include <macros.hpp>
 #include <types.hpp>

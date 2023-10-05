@@ -9,7 +9,7 @@
 /* Skynet includes */
 #include "macros.hpp"
 
-namespace skynet::time
+namespace util::time
 {
       inline uint64_t timestamp() {
             return TIMESTAMP();

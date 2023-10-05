@@ -10,7 +10,7 @@ set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 # Add the executable with all the source files.
-add_executable(${PROJECT_NAME} "main.cpp" "unipp.hpp" "sha256_test.hpp" "ecdsa_test.hpp")
+add_executable(${PROJECT_NAME} "main.cpp" "unipp.hpp" "sha256_test.hpp" "ecdsa_test.hpp" "io_test.hpp")
 
 # Link to the skynet library and set the include directory.
 add_library(skynet SHARED IMPORTED)
