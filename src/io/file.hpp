@@ -12,6 +12,7 @@
 
 /** C++ includes */
 #include <string>
+#include <memory>
 
 /** Skynet includes */
 #include <macros.hpp>
@@ -40,7 +41,7 @@ namespace io::file
       };
 
       /** Gets the error message */
-      inline std::string ErrorToString(Error error);
+      std::string ErrorToString(Error error);
 
       /** Read the contents of a file in binary format */
       Error Read(const std::string& path, std::unique_ptr<byte[]>& data, uint32_t& size);
@@ -56,29 +57,29 @@ namespace io::file
       Error Write(const std::string& path, const std::string& data);
 
       /** Check if a file exists */
-      inline bool Exists(const std::string& path);
+      bool Exists(const std::string& path);
       /** Check if a file is open */
-      inline bool IsOpen(const std::string& path);
+      bool IsOpen(const std::string& path);
       /** Check if a file is empty */
-      inline bool IsEmpty(const std::string& path);
+      bool IsEmpty(const std::string& path);
 
       /** Get the size of a file in bytes */
-      inline uint32_t GetSize(const std::string& path);
+      uint32_t GetSize(const std::string& path);
       /** Get the extension of a file */
-      inline std::string GetExtension(const std::string& path);
+      std::string GetExtension(const std::string& path);
       /** Get the filename without the extension */
-      inline std::string GetFilename(const std::string& path);
+      std::string GetFilename(const std::string& path);
       /** Get the path without the filename */
-      inline std::string GetPathWithoutFilename(const std::string& path);
+      std::string GetPathWithoutFilename(const std::string& path);
       /** Convert relative path to absolute path */
-      inline std::string GetAbsolutePath(const std::string& path);
+      std::string GetAbsolutePath(const std::string& path);
       /** Builds a path string from path fragments */
       template<typename... Args>
-      inline std::string BuildPath(const Args&... args);
+      std::string BuildPath(const Args&... args);
       /** Get the current working directory */
-      inline std::string GetWorkingDirectory();
+      std::string GetWorkingDirectory();
       /** Deletes a file */
-      inline void Delete(const std::string& path);
+      void Delete(const std::string& path);
 
       /** Creates all the needed directories in a path if they do not exist */
       static void CreateDirectories(const std::string& path);

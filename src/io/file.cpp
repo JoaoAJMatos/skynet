@@ -17,7 +17,7 @@
  * @param path The file to check
  * @return true if the file exists, false otherwise
  */
-inline bool io::file::Exists(const std::string& path) {
+bool io::file::Exists(const std::string& path) {
       std::ifstream file(path);
       return file.good();
 }
@@ -28,7 +28,7 @@ inline bool io::file::Exists(const std::string& path) {
  * @param path The file to check
  * @return true if the file is open, false otherwise
  */
-inline bool io::file::IsOpen(const std::string& path) {
+bool io::file::IsOpen(const std::string& path) {
       std::ifstream file(path);
       return file.is_open();
 }
@@ -39,7 +39,7 @@ inline bool io::file::IsOpen(const std::string& path) {
  * @param path The file to check
  * @return true if the file is empty, false otherwise
  */
-inline bool io::file::IsEmpty(const std::string& path) {
+bool io::file::IsEmpty(const std::string& path) {
       std::ifstream file(path);
       return file.peek() == std::ifstream::traits_type::eof();
 }
@@ -50,7 +50,7 @@ inline bool io::file::IsEmpty(const std::string& path) {
  * @param path The file to check
  * @return The size of the file in bytes
  */
-inline uint32_t io::file::GetSize(const std::string& path) {
+uint32_t io::file::GetSize(const std::string& path) {
       std::ifstream file(path, std::ios::binary | std::ios::ate);
       return file.tellg();
 }
@@ -61,7 +61,7 @@ inline uint32_t io::file::GetSize(const std::string& path) {
  * @param path The file to check
  * @return The extension of the file
  */
-inline std::string io::file::GetExtension(const std::string& path) {
+std::string io::file::GetExtension(const std::string& path) {
       return std::filesystem::path(path).extension().string();
 }
 
@@ -71,7 +71,7 @@ inline std::string io::file::GetExtension(const std::string& path) {
  * @param path The file to check
  * @return The path without the extension
  */
-inline std::string io::file::GetPathWithoutFilename(const std::string& path) {
+std::string io::file::GetPathWithoutFilename(const std::string& path) {
       return std::filesystem::path(path).filename().string();
 }
 
@@ -81,7 +81,7 @@ inline std::string io::file::GetPathWithoutFilename(const std::string& path) {
  * @param path The file to check
  * @return The absolute path of the file
  */
-inline std::string io::file::GetAbsolutePath(const std::string& path) {
+std::string io::file::GetAbsolutePath(const std::string& path) {
       return std::filesystem::absolute(path).string();
 }
 
@@ -92,7 +92,7 @@ inline std::string io::file::GetAbsolutePath(const std::string& path) {
  * @return The built path (absolute path)
  */
 template<typename... Args>
-inline std::string io::file::BuildPath(const Args&... args) {
+std::string io::file::BuildPath(const Args&... args) {
       std::string path = std::filesystem::path(args...).string();
       return GetAbsolutePath(path);
 }
@@ -102,7 +102,7 @@ inline std::string io::file::BuildPath(const Args&... args) {
  *
  * @return The current working directory
  */
-inline std::string io::file::GetWorkingDirectory() {
+std::string io::file::GetWorkingDirectory() {
       return std::filesystem::current_path().string();
 }
 
@@ -294,14 +294,14 @@ io::file::Error io::file::Write(const std::string& path, const std::string& data
  *
  * @param path The file to delete
  */
-inline void io::file::Delete(const std::string& path) {
+void io::file::Delete(const std::string& path) {
       std::remove(path.c_str());
 }
 
 /**
  * @brief Returns the error message for the given error code
  */
-inline std::string io::file::ErrorToString(io::file::Error error) {
+std::string io::file::ErrorToString(io::file::Error error) {
       switch (error) {
             case io::file::Error::FILE_SUCCESS: return "Success";
             case io::file::Error::FILE_NOT_FOUND: return "File not found";

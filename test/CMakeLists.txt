@@ -14,7 +14,16 @@ add_executable(${PROJECT_NAME} "main.cpp" "unipp.hpp" "sha256_test.hpp" "ecdsa_t
 
 # Link to the skynet library and set the include directory.
 add_library(skynet SHARED IMPORTED)
-set_target_properties(skynet PROPERTIES IMPORTED_LOCATION "${CMAKE_SOURCE_DIR}/../bin/libskynet.dylib")
+
+# Set the path to the skynet library depending on the platform.
+if (WIN32)
+    set_target_properties(skynet PROPERTIES IMPORTED_LOCATION "${CMAKE_SOURCE_DIR}/../bin/skynet.dll")
+elseif (APPLE)
+    set_target_properties(skynet PROPERTIES IMPORTED_LOCATION "${CMAKE_SOURCE_DIR}/../bin/libskynet.dylib")
+else ()
+    set_target_properties(skynet PROPERTIES IMPORTED_LOCATION "${CMAKE_SOURCE_DIR}/../bin/libskynet.so")
+endif ()
+
 target_include_directories(${PROJECT_NAME} PRIVATE "${CMAKE_SOURCE_DIR}/../src")
 target_link_libraries(${PROJECT_NAME} skynet)
 

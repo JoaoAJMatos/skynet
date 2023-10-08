@@ -24,7 +24,15 @@ set_target_properties(${PROJECT_NAME} PROPERTIES LIBRARY_OUTPUT_DIRECTORY "${PRO
 
 # Set library dependencies
 add_library(secp256k1 SHARED IMPORTED)
-set_target_properties(secp256k1 PROPERTIES IMPORTED_LOCATION "${PROJECT_SOURCE_DIR}/lib/libsecp256k1.2.dylib")
+
+# Include different libraries depending on the OS
+if(APPLE)
+    set_target_properties(secp256k1 PROPERTIES IMPORTED_LOCATION "${PROJECT_SOURCE_DIR}/lib/libsecp256k1.2.dylib")
+elseif(UNIX AND NOT APPLE)
+    set_target_properties(secp256k1 PROPERTIES IMPORTED_LOCATION "${PROJECT_SOURCE_DIR}/lib/libsecp256k1.so.2")
+elseif(WIN32)
+    set_target_properties(secp256k1 PROPERTIES IMPORTED_LOCATION "${PROJECT_SOURCE_DIR}/lib/libsecp256k1.dll")
+endif()
 
 # Link library dependencies
 target_link_libraries(${PROJECT_NAME} secp256k1 pthread)

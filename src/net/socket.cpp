@@ -133,11 +133,6 @@ uint16_t net::Socket::GetRemotePort() const {
 }
 
 
-int net::Socket::GetSocket() const {
-      return this->socket_;
-}
-
-
 // MIT License
 // 
 // Copyright (c) 2023 João Matos

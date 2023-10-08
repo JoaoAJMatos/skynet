@@ -95,9 +95,10 @@ void ConfigParserSaveTest() {
  */
 void ConfigParserLoadTest() {
       ConfigMap config = io::config::Load("test.cfg");
-      ASSERT_EQUAL(config["key1"], "value1", "Failed to load config");
-      ASSERT_EQUAL(config["key2"], "value2", "Failed to load config");
-      ASSERT_EQUAL(config["key3"], "value3", "Failed to load config");
+      // TODO: See if I can make unipp support different types on these asserts so I dont need to convert to string
+      ASSERT_EQUAL(config["key1"], std::string("value1"), "Failed to load config");
+      ASSERT_EQUAL(config["key2"], std::string("value2"), "Failed to load config");
+      ASSERT_EQUAL(config["key3"], std::string("value3"), "Failed to load config");
       io::file::Delete("test.cfg");
 }
 

@@ -12,14 +12,14 @@
 
 /** C++ includes */
 #include <string>
+#include <map>
 
 
 /** Skynet includes */
 #include <io/file.hpp>
-#include <util/map.hpp>
 
 /** Configuration map */
-using ConfigMap = util::Map<std::string, std::string>;
+using ConfigMap = std::map<std::string, std::string>;
 
 namespace io::config
 {      

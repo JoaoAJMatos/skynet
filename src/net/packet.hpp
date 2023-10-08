@@ -18,6 +18,7 @@
 
 /** C++ headers */
 #include <cstdint>
+#include <string>
 
 /** Skynet headers */
 #include <types.hpp>
@@ -25,7 +26,7 @@
 
 namespace net::packet
 {
-      /** Packet constants */
+    /** Packet constants */
 	constexpr uint16_t MAX_SIZE = 65535;
 	constexpr uint16_t MAX_DATA_SIZE = MAX_SIZE - sizeof(header_t);
 

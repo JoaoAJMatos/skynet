@@ -27,6 +27,7 @@
 #include <functional>
 #include <stdexcept>
 #include <memory>
+#include <chrono>
 
 /** MACROS */
 #define UNIPP_TEST_FRAMEWORK_VERSION "0.1.0"

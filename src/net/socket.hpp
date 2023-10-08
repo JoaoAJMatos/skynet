@@ -40,7 +40,8 @@ namespace net
             uint16_t GetRemotePort() const;
 
             /* Getters */
-            [[nodiscard]] int GetSocket() const;
+            [[nodiscard]] int GetSocket() const
+            { return socket_; }
       private:
             int socket_;
       };

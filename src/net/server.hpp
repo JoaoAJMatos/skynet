@@ -6,7 +6,6 @@
  * 
  * @copyright Copyright (c) 2023
  */
-
 #ifndef SKYNET_SERVER_HPP
 #define SKYNET_SERVER_HPP
 
@@ -39,12 +38,12 @@ namespace net
             void Stop();
 
             /** Getters */
-            [[nodiscard]] int GetPort() const;
-            [[nodiscard]] int GetBacklog() const;
+            [[nodiscard]] int GetPort() const { return ntohs(address.sin_port); }
+            [[nodiscard]] int GetBacklog() const { return backlog; }
 
             /** Setters */
-            void SetPort(int port);
-            void SetBacklog(int backlog);
+            void SetPort(int port) { address.sin_port = htons(port); }
+            void SetBacklog(int backlog) { this->backlog = backlog; }
       private:
             sockaddr_in address;
             int backlog;
