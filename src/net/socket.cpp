@@ -2,6 +2,7 @@
 // Created by João Matos on 01/02/2023.
 //
 
+/** Platform specific includes for networking */
 #if defined(_WIN32) || defined(_WIN64)
 #include <winsock2.h>
 #include <ws2tcpip.h>
@@ -13,7 +14,6 @@
 #include <arpa/inet.h>
 #include <unistd.h>
 #endif // defined(_WIN32) || defined(_WIN64)
-
 
 /* C++ includes */
 #include <iostream>
@@ -39,6 +39,13 @@ static inline void init_winsock_if_needed() {
 }
 
 
+/**
+ * @brief Initializes a socket.
+ *
+ * @param domain The domain of the socket.
+ * @param type The type of the socket.
+ * @param protocol The protocol of the socket.
+ */
 net::Socket::Socket(int domain, int type, int protocol) {
       assert(domain == AF_INET || domain == AF_INET6);
       assert(type == SOCK_STREAM || type == SOCK_DGRAM);
@@ -51,6 +58,13 @@ net::Socket::Socket(int domain, int type, int protocol) {
       }
 }
 
+/**
+ * @brief Initializes a socket.
+ *
+ * @param domain The domain of the socket.
+ * @param type The type of the socket.
+ * @param protocol The protocol of the socket.
+ */
 net::Socket::Socket(int domain, int type, net::Protocol protocol) {
 	assert(domain == AF_INET || domain == AF_INET6);
 	assert(type == SOCK_STREAM || type == SOCK_DGRAM);
@@ -59,21 +73,24 @@ net::Socket::Socket(int domain, int type, net::Protocol protocol) {
 
       int protocol_int = static_cast<int>(protocol);
 	this->socket_ = socket(domain, type, protocol_int);
-	if (this->socket_ < 0) {
+	if (!this->IsValid()) {
 		throw std::runtime_error("Failed to create socket");
 	}
 }
 
+/** @brief Destructor */
 net::Socket::~Socket() { 
       close(this->socket_); 
 }
 
+/** @brief Closes the socket */
 void net::Socket::Close() const { 
       close(this->socket_); 
 }
 
+/** @brief Checks if the file descriptor is OK */
 int net::Socket::IsValid() const { 
-      return this->socket_ != -1; 
+      return this->socket_ != net::SOCKET_ERROR; 
 }
 
 /**
@@ -90,13 +107,13 @@ void net::Socket::SetNonBlocking(const bool flag) const {
 	}
 #else
       int flags = fcntl(this->socket_, F_GETFL, 0);
-      if (flags == -1) {
+      if (flags == net::SOCKET_ERROR) {
             throw std::runtime_error("Failed to get socket flags");
       }
 
       flags = flag ? (flags | O_NONBLOCK) : (flags & ~O_NONBLOCK);
       int result = fcntl(this->socket_, F_SETFL, flags);
-      if (result == -1) {
+      if (result == net::SOCKET_ERROR) {
             throw std::runtime_error("Failed to set socket flags");
       }
 #endif // defined(_WIN32) || defined(_WIN64)
@@ -110,7 +127,7 @@ std::string net::Socket::GetRemoteAddress() const {
       struct sockaddr_in addr;
       socklen_t addr_size = sizeof(struct sockaddr_in);
       int res = getpeername(this->socket_, (struct sockaddr *)&addr, &addr_size);
-      if (res == -1) {
+      if (res == net::SOCKET_ERROR) {
             throw std::runtime_error("Failed to get peer name");
       }
       char ipstr[INET_ADDRSTRLEN] = {'\0'};
@@ -126,7 +143,7 @@ uint16_t net::Socket::GetRemotePort() const {
       struct sockaddr_in addr;
       socklen_t addr_size = sizeof(struct sockaddr_in);
       int res = getpeername(this->socket_, (struct sockaddr *)&addr, &addr_size);
-      if (res == -1) {
+      if (res == net::SOCKET_ERROR) {
             throw std::runtime_error("Failed to get peer name");
       }
       return ntohs(addr.sin_port);

@@ -60,32 +60,62 @@
 #include <limits.h>
 #include <stdio.h>
 
-/**
- * @brief Fills the given buffer with random bytes.
- * 
- * @param data The buffer to be filled with random bytes.
- * @param size The size of the buffer.
- * @return int 1 if the operation was successful, 0 otherwise.
- */
-static int fill_random(byte* data, size_t size) {
+namespace crypto::random
+{
+      /**
+       * @brief   Fills the given buffer with random bytes.
+       *
+       * @details In case the prefered function for getting randomness
+       *          is not available or fails on POSIX systems, we should
+       *          fallback to `/dev/urandom` to extract the randomness
+       *          we need.
+       * 
+       * @param data The buffer to be filled with random bytes.
+       * @param size The size of the buffer.
+       * @return int 1 if the operation was successful, 0 otherwise.
+       */
+      static int urandom_bytes(byte* data, size_t size) {
+            FILE* urandom = fopen("/dev/urandom", "rb");
+            if (urandom == NULL) {
+                  return 0;
+            }
+            size_t read = fread(data, 1, size, urandom);
+            fclose(urandom);
+            return read == size;
+      }
+
+      /**
+       * @brief Fills the given buffer with random bytes.
+       * 
+       * @param data The buffer to be filled with random bytes.
+       * @param size The size of the buffer.
+       * @return int 1 if the operation was successful, 0 otherwise.
+       */
+      static int fill_random(byte* data, size_t size) {
 #if defined(_WIN32)
-      if (BCryptGenRandom(NULL, data, size, BCRYPT_USE_SYSTEM_PREFERRED_RNG) != STATUS_SUCCESS) {
-            return 0;
-      }
+            if (BCryptGenRandom(NULL, data, size, BCRYPT_USE_SYSTEM_PREFERRED_RNG) != STATUS_SUCCESS) {
+                  return 0;
+            }
 #elif defined(__linux__) || defined(__FreeBSD__)
-      /* If `getrandom(2)` is not available, you should fallback to /dev/urandom */
-      if (getrandom(data, size, 0) != size) {
-            return 0;
-      }
+            /* If `getrandom(2)` is not available, you should fallback to /dev/urandom */
+            if (getrandom(data, size, 0) != size) {
+                  return 0;
+            }
+
+            /* Fallback to /dev/urandom */
+            urandom_bytes(data, size);
 #elif defined(__APPLE__) || defined(__OpenBSD__)
-      /* If `getentropy(2)` is not available, you should fallback to /dev/urandom 
-       * or `SecRandomCopyBytes` */
-      if (getentropy(data, size) != 0) {
-            return 0;
-      }
+            if (getentropy(data, size) != 0) {
+                  return 0;
+            }
+
+            /* Fallback to /dev/urandom */
+            urandom_bytes(data, size);
 #endif
-      return 1;
-}
+            return 1;
+      }
+
+} // namespace random
 
 #endif // SKYNET_RANDOM_HPP
 

@@ -1,0 +1,3 @@
+/Users/joaoamatos/coding/c++/skynet/CMakeFiles/skynet.dir
+/Users/joaoamatos/coding/c++/skynet/CMakeFiles/edit_cache.dir
+/Users/joaoamatos/coding/c++/skynet/CMakeFiles/rebuild_cache.dir

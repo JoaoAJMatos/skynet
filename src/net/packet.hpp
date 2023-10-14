@@ -26,7 +26,7 @@
 
 namespace net::packet
 {
-    /** Packet constants */
+      /** Packet constants */
 	constexpr uint16_t MAX_SIZE = 65535;
 	constexpr uint16_t MAX_DATA_SIZE = MAX_SIZE - sizeof(header_t);
 
@@ -39,9 +39,9 @@ namespace net::packet
 
 	/** Packet headers */
 	typedef struct Header {
-		Type type;
-		uint16_t size;
-		uint16_t id;
+		Type type;          /** The type of the packet */
+		uint16_t dataSize;  /** The size of the payload */
+		uint16_t id;        /** The ID of the packet 0,1,2,3... */
 	} header_t;
 
 	
@@ -61,18 +61,25 @@ namespace net::packet
             /** Returns the payload casted to the given type */
 		template <typename T>
 		T GetDataAs<T>() const;
+            /** Returns the type of the packet */
 		Type GetType() const;
+            /** Returns the total size of the packet */
 		uint16_t GetSize() const;
+            /** Returns the id of the packet */
 		uint16_t GetId() const;
 		
 		/** Setters */
+            /** Sets the payload of the packet */
 		void SetPayload(const byte* data, uint16_t size);
+            /** Sets the string as the packet payload and sets the data size */
 		void SetPayload(const std::string& data);
+            /** Sets the type of the packet */
 		void SetType(Type type);
+            /** Sets the id of the packet */
 		void SetId(uint16_t id);
 	private:
-		header_t header_;
-		byte data_[MAX_DATA_SIZE];
+		header_t header;
+		byte data[MAX_DATA_SIZE];
 	};
 }
 

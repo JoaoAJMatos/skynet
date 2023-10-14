@@ -2,8 +2,16 @@
 // Created by João Matos on 01/02/2023.
 //
 
+/** Local Includes */
 #include "server.hpp"
 
+/**
+ * @brief Initializes a server.
+ *
+ * @param port The port to listen on.
+ * @param protocol The protocol to use.
+ * @param backlog The maximum number of pending connections.
+ */
 net::Server::Server(int port, Protocol protocol, int backlog) : Socket(AF_INET, 0, protocol) {
       this->backlog = backlog;
       this->address.sin_family = AF_INET;
@@ -22,6 +30,7 @@ net::Server::Server(int port, Protocol protocol, int backlog) : Socket(AF_INET, 
             throw std::runtime_error("Failed to listen on socket");
 }
 
+/** @brief Destroys the server */
 net::Server::~Server() {
 	this->Stop();
 }
@@ -43,6 +52,11 @@ void net::Server::Run() {
  */
 void net::Server::Stop() {
 	this->shouldStop = true;
+}
+
+/** @brief Checks if the server backlog is full */
+bool BacklogFull() {
+      return errno == EAGAIN || errno == EWOULDBLOCK;
 }
 
 // MIT License

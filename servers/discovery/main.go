@@ -13,40 +13,40 @@
 package main
 
 import (
-	"flag"								/** Command line arguments parser */
-	"fmt"								/** Formatting library */
-	"net"								/** Network library */
-	"net/http"							/** HTTP server */
-	"github.com/rs/zerolog"				/** Logging library */
-	"github.com/rs/zerolog/log"			/** Logging library */
-	_ "github.com/mattn/go-sqlite3"		/** SQLite3 driver */
+	"flag"					/** Command line arguments parser */
+	"fmt"						/** Formatting library */
+	"net"						/** Network library */
+	"net/http"					/** HTTP server */
+	"github.com/rs/zerolog"			/** Logging library */
+	"github.com/rs/zerolog/log"		/** Logging library */
+	_ "github.com/mattn/go-sqlite3"	/** SQLite3 driver */
 	"github.com/oschwald/geoip2-golang"	/** GeoIP database */
 )
 
 var (
 	/** Command line arguments */
-	port = flag.Int("port", 8080, "Discovery server port")				/** Discovery server port */
+	port = flag.Int("port", 8080, "Discovery server port")		/** Discovery server port */
 	host = flag.String("host", "localhost", "Discovery server host")	/** Discovery server host */
-	db = flag.String("db", "peers.db", "Discovery server database")		/** Discovery server database */
+	db = flag.String("db", "peers.db", "Discovery server database")	/** Discovery server database */
 )
 
 const (
-	MaxPeers = 100							/** Maximum number of peers to return in a single request */
+	MaxPeers = 100					/** Maximum number of peers to return in a single request */
 	GeoIPDatabase = "GeoIP2-City.mmdb"		/** Path to the GeoIP database */
-	DistanceWeight = 0.6					/** Weight of the distance in the peer sorting algorithm */
-	LastSeenWeight = 0.4					/** Weight of the last seen time in the peer sorting algorithm */
+	DistanceWeight = 0.6				/** Weight of the distance in the peer sorting algorithm */
+	LastSeenWeight = 0.4				/** Weight of the last seen time in the peer sorting algorithm */
 	PeerSweepInterval = 5 * time.Minute		/** Interval at which the peers are swept to remove the offline ones */
 )
 
 struct Peer {
-	Hostname string			/** Hostname of the peer */
-	IP string				/** IP address of the peer */
-	Port int				/** Port on which the peer is listening */
-	PubKey string			/** EC secp256k1 Public key of the peer */
+	Hostname string		/** Hostname of the peer */
+	IP string		      /** IP address of the peer */
+	Port int			/** Port on which the peer is listening */
+	PubKey string		/** EC secp256k1 Public key of the peer */
 	Signature string 		/** Signature of the peer's UUID */
 	RegisteredAt time.Time  /** Time at which the peer registered itself */
 	LastSeenAt time.Time    /** Time at which the peer was last seen */
-	IsOnline bool			/** Whether the peer is online or not */
+	IsOnline bool		/** Whether the peer is online or not */
 }
 
 /** List of peers */

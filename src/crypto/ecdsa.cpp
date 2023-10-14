@@ -45,7 +45,7 @@ crypto::ECError crypto::ECDSA::MakeKeyPair() {
 
       /** Before we call the API functions we need to create the context */
       this->context_ = secp256k1_context_create(SECP256K1_CONTEXT_SIGN | SECP256K1_CONTEXT_VERIFY);
-      if (!fill_random(randomize, sizeof(randomize))) {
+      if (!random::fill_random(randomize, sizeof(randomize))) {
             return crypto::ECError::RANDOMNESS_ERROR;
       }
 
@@ -67,7 +67,7 @@ crypto::ECError crypto::ECDSA::MakeKeyPair() {
        * happening is negligible. 
        */
       loop() {
-            if (!fill_random(this->private_key_, sizeof(this->private_key_))) 
+            if (!random::fill_random(this->private_key_, sizeof(this->private_key_))) 
                   return crypto::ECError::RANDOMNESS_ERROR;
 
             if (secp256k1_ec_seckey_verify(this->context_, this->private_key_)) 

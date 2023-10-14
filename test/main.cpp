@@ -29,6 +29,7 @@
 int main(void) {
       io::stdout::WriteLine(COLORED(GREEN, "Running unit tests..."));
 
+
       RUN(
             SUITE("Cryptography Interface", "Tests Skynet's cryptography interface",
                   TEST("Sha-256 Test", "Tests the SHA256 hash function", HashTest),

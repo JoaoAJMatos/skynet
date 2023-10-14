@@ -17,27 +17,35 @@
 #ifndef SKYNET_BLOCK_HPP
 #define SKYNET_BLOCK_HPP
 
-/* Skynet Includes */
+/** C++ Includes */
+#include <vector>
+
+/** Skynet Includes */
 #include <types.hpp>
+#include <transaction.hpp>
 
-class Block
+namespace skynet
 {
-public:
-      Block() = default;
-      ~Block() = default;
-private:
-      byte* data_;
-      byte* hash_;
-      byte* prev_hash_;
-      byte* merkle_root_;
-      int nonce_;
-      int difficulty_;
-      uint64_t timestamp_;
-};
+      class Block
+      {
+      public:
+            Block() = default;
+            ~Block() = default;
+      private:
+            byte* data;
+            byte* hash;
+            byte* previousHash;
+            byte* merkleRoot;
+            std::vector<Transaction> transactions;
+            int nonce;
+            int difficulty;
+            uint64_t timestamp;
+      };
 
-/* Returns the Genesis block of the Blockchain */
-inline Block GenesisBlock();
+      /* Returns the Genesis block of the Blockchain */
+      inline Block GenesisBlock();
 
+} // namespace skynet
 
 #endif // !SKYNET_BLOCK_HPP
 

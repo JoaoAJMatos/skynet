@@ -36,6 +36,8 @@ namespace net
             void Run();
             /** Stops the server loop */
             void Stop();
+            /** Checks if the server backlog is full */
+            bool BacklogFull();
 
             /** Getters */
             [[nodiscard]] int GetPort() const { return ntohs(address.sin_port); }

@@ -18,6 +18,7 @@ namespace net
 {
       /** Default network buffer size */
       constexpr int NET_BUFFER_SIZE = 1024;
+      constexpr int SOCKET_ERROR = -1;
 
       enum class Protocol {
             TCP = 1,

@@ -27,7 +27,7 @@
  * @param str
  * @return std::string 
  */
-std::string trim(const std::string& str) {
+static std::string trim(const std::string& str) {
       size_t first = str.find_first_not_of(' ');
       if (std::string::npos == first) {
             return str;
