@@ -23,27 +23,48 @@
 /** Skynet Includes */
 #include <types.hpp>
 #include <transaction.hpp>
+#include <consensus.hpp>
 
 namespace skynet
 {
+      typedef struct {
+            float version;                /** Version of the blockchain when the block was created */
+            byte* previousHash;           /** Hash of the previous block */
+            byte* merkleRoot;             /** Merkle root of the block */
+            uint64_t timestamp;           /** Timestamp of the block */
+            int difficultyTarget;         /** Difficulty target of the block */
+            int nonce;                    /** Nonce of the block */
+      } BlockHeader;
+
       class Block
       {
       public:
             Block() = default;
             ~Block() = default;
+
+            /** Returns the formatted string representation of a block */
+            std::string ToString() const;
+            /** Returns the hash of the block */
+            byte* Hash() const;
+
+            /** Returns the block's headers */
+            BlockHeader GetHeaders() const;
+            /** Returns the block's transactions */
+            std::vector<Transaction> GetTransactions() const;
+            /** Returns the block's size */
+            int GetSize() const;
       private:
-            byte* data;
-            byte* hash;
-            byte* previousHash;
-            byte* merkleRoot;
-            std::vector<Transaction> transactions;
-            int nonce;
-            int difficulty;
-            uint64_t timestamp;
+            BlockHeader headers;                      /** Block headers */
+            std::vector<Transaction> transactions;    /** Transactions in the block */
+            int size;                                 /** Size of the block in bytes */
       };
 
       /* Returns the Genesis block of the Blockchain */
       inline Block GenesisBlock();
+      /* Returns the Genesis block header of the Blockchain */
+      BlockHeader GenesisBlockHeader();
+      /** Make block header with the given params */
+      BlockHeader MakeBlockHeader(float version, byte* previousHash, byte* merkleRoot, uint64_t timestamp, int difficultyTarget, int nonce);
 
 } // namespace skynet
 

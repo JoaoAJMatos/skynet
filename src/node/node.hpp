@@ -11,23 +11,93 @@
  * @copyright Copyright (c) 2023
  */
 
+/* C++ Includes */
+#include <stdexcept>
+#include <memory>
+
 /* Skynet Includes */
 #include <net/client.hpp>
 #include <net/server.hpp>
 
+/* Local Includes */
+#include "base_miner.hpp"
+
 namespace skynet
 {
-class NodeServer : public net::Server
-{
-};
+      enum NodeType
+      {
+            FULL_NODE,
+            LIGHT_NODE, 
+            MINER_NODE
+      };
 
-class NodeClient : public net::Client
-{
-};
+      /** TRANSPORT INTERFACES */
+      class NodeServer : public net::Server
+      {
+      };
 
-class Node
-{
-};
+      class NodeClient : public net::Client
+      {
+      };
+
+      /** NODE EXCEPTION */
+      class NodeException : public std::runtime_error
+      {
+      public:
+            NodeException(const char *message) : std::runtime_error(message) {}
+            NodeException(const std::string &message) : std::runtime_error(message) {}
+            virtual ~NodeException() {}
+
+            virtual const char *what() const noexcept override
+            {
+                  return std::runtime_error::what();
+            }
+
+      private:
+            std::string message;
+      };
+
+      /** NODE CLASS */
+      class Node
+      {
+      public:
+            Node(NodeType type);
+            ~Node();
+
+            /** Starts the node */
+            void Start();
+            /** Stops the node */
+            void Stop();
+
+            /** Getters */
+            [[nodiscard]] NodeType GetType() const { return type; }
+            [[nodiscard]] NodeServer *GetServer() const { return server; }
+            [[nodiscard]] NodeClient *GetClient() const { return client; }
+
+            /** Setters */
+            void SetMiner(std::shared_ptr<Miner> miner) { this->miner = miner; }
+      private:
+            /** Bootstrap the node */
+            void Bootstrap();
+            /** Load config */
+            void LoadConfig();
+            /** Save config */
+            void SaveConfig();
+            /** Reload config */
+            void ReloadConfig();
+            /** Fetch peers */
+            void FetchPeers();
+            /** Connect to peers */
+            void ConnectToPeers();
+            /** Sync with peers */
+            void SyncWithPeers();
+
+            NodeType type;
+            NodeServer *server;
+            NodeClient *client;
+
+            std::shared_ptr<Miner> miner;
+      };
 } // namespace skynet
 
 // MIT License

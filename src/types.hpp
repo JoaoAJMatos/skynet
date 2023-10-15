@@ -7,5 +7,6 @@
 
 typedef unsigned char byte;
 typedef unsigned int  word;
+typedef unsigned char uuid[16];
 
 #endif //SKYNET_TYPES_HPP

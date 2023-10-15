@@ -18,6 +18,7 @@
 /** Skynet includes */
 #include <types.hpp>
 #include <crypto/ecdsa.hpp>
+#include <crypto/sha256.hpp>
 
 namespace skynet
 {
@@ -47,6 +48,7 @@ namespace skynet
             time_t timestamp;                                    /** The timestamp of the transaction */
             int balance;                                         /** The sender's balance before the transaction */
             byte sender[crypto::COMPRESSED_PUBLIC_KEY_SIZE];     /** The sender's wallet address */
+            byte signature[crypto::SIGNATURE_SIZE];              /** The transaction's digital signature */
       };
 
       /**
@@ -56,8 +58,27 @@ namespace skynet
       class Transaction
       {
       public:
+            Transaction(InputMap input_map, OutputMap output_map);
+            ~Transaction();
 
+            /** Signs the transaction with the sender's private key */
+            void Sign(byte *private_key);
+            /** Checks if a transaction is valid */
+            bool IsValid();
+
+            std::string ToString() const;
+
+            /** Getters */
+            [[nodiscard]] InputMap GetInputMap() const { return input_map; }
+            [[nodiscard]] OutputMap GetOutputMap() const { return output_map; }
+            void GetID(byte *id) { memcpy(id, this->id, crypto::SHA256_HASH_SIZE); }
       private:
+            /** Get transaction hash */
+            void GetHash(byte *hash);
+
+            InputMap input_map;
+            OutputMap output_map;
+            byte id[crypto::SHA256_HASH_SIZE];
       };
 }
 

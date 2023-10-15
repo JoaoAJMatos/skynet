@@ -33,6 +33,12 @@ namespace crypto
       constexpr int SERIALIZED_SIGNATURE_SIZE = 64;   // Serialized signature size
       constexpr int SIGNATURE_SIZE = 72;              // Signature size
 
+      /** Seed size for hierarchical deterministic wallet */
+      constexpr int HD_WALLET_SEED_SIZE = 64;
+
+      /** Generates a new seed for a hierarchical deterministic wallet */
+      void generate_hd_wallet_seed(byte *seed);
+
       /** Return values for the ECDSA functions */
       enum ECError
       {
