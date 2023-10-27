@@ -3,3 +3,6 @@ build/
 bin/
 out/
 .vs
+.vscode
+.idea
+.VSCodeCounter
