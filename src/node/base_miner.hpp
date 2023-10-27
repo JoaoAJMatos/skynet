@@ -12,20 +12,50 @@
 
 /* Skynet Includes */
 #include <block.hpp>
+#include <blockchain.hpp>
 #include <mempool.hpp>
 #include <transaction.hpp>
+
+/** C++ Includes */
+#include <functional>
 
 namespace skynet
 {
       class Miner
       {
       public:
-            Miner() {}
-            virtual Block Mine(MemPool &mempool) = 0;
+            /**
+             * @brief Construct a new Miner object
+             * @details The Miner object is used to mine blocks in the Skynet Network.
+             *          It receives a mempool reference and a callback function that will be called
+             *          when a block is successfully mined; this is where the block should be serialized
+             *          and broadcasted to the network.
+             * 
+             * @param mempool 
+             * @param callback 
+             */
+            Miner(MemPool* mempool, Chain* chain, std::function<void(Block)> callback) 
+                  : mempool(mempool), chain(chain), callback(callback) 
+            {
+
+            }
+
+            /**
+             * @brief Destroy the Miner object
+             */
             virtual ~Miner() {}
+
+            /**
+             * @brief Mines a block
+             * @details This function should be implemented by the user.
+             *          It should create a block, add transactions to it, mine it and
+             *          call the callback function with the mined block.
+             */
+            virtual void Mine();
       private:
-            /** Selects the transactions from the mempool */
-            std::vector<Transaction> SelectTransactions(MemPool &mempool);
+            MemPool* mempool;
+            Chain* chain;
+            std::function<void(Block)> callback;
       };
 } // namespace skynet
 

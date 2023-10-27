@@ -18,8 +18,10 @@
 #ifndef SKYNET_BLOCKING_QUEUE_HPP
 #define SKYNET_BLOCKING_QUEUE_HPP
 
+/** C++ Includes */
 #include <queue>
 
+/** Local Includes */
 #include "mtx.hpp"
 
 namespace threading
