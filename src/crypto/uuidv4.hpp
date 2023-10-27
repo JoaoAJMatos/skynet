@@ -19,11 +19,11 @@
 /** Skynet includes */
 #include <types.hpp>
 
-namespace crypto
+namespace crypto::uuidv4
 {
       static constexpr char HEX[] = "0123456789abcdef";
 
-      static std::string uuidv4() {
+      static std::string Generate() {
             std::random_device rd;
             std::mt19937 gen(rd());
             std::uniform_int_distribution<> dis(0, 15);
@@ -54,6 +54,6 @@ namespace crypto
             }
             return uuid; 
       }
-} // namespace crypto
+} // namespace crypto::uuidv4
 
 #endif // CRYPTO_UUIDV4_HPP

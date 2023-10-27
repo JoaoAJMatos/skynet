@@ -36,6 +36,7 @@ namespace crypto::aes
       constexpr int BLOCK_BIT_SIZE = 128;
       constexpr int BLOCK_BYTE_SIZE = BLOCK_BIT_SIZE / 8;
 
+      /** Type aliases */
       using iv = byte[BLOCK_BYTE_SIZE];
       using Key = byte*;
 

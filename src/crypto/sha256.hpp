@@ -19,7 +19,8 @@
  *      byte data[] = "Hello World!";
  *      byte hash[SHA256_HASH_LENGTH];
  *     
- *      crypto::SHA256::Hash(data, sizeof(data), hash);
+ *      crypto::hashing::SHA256(data, sizeof(data), hash);
+ *
  *      return 0;
  * }
  */
@@ -35,30 +36,37 @@
 /* Skynet includes */
 #include <types.hpp>
 
-namespace crypto 
+namespace crypto::hashing 
 {
       constexpr int SHA256_HASH_SIZE  = 32;
       constexpr int SHA256_BLOCK_SIZE = 64;
       constexpr int SHA256_STATE_SIZE = 8;
-
+      
       class SHA256 
       {
       public:
             SHA256();
+            SHA256(const byte* data, size_t len, byte* out);
+            SHA256(const std::string& filename, byte* out);
             ~SHA256();
-            
-            /** Hashes the given data and outputs the digest to byte *hash */
-            static void Hash(const byte *data, size_t len, byte *hash);
-            /** Hashes the given file and outputs the digest to byte *hash */
-            static void HashFile(const std::string &filename, byte *hash);
+
             /** Compares two hashes, true if equal, false if not */
             static bool CompareHash(const byte *hash1, const byte *hash2);
             /** Prints a hash to the stdout */
             static void PrintHash(byte *hash);
+
       private:
             /* Private Functions */
             void Update(const byte *data, size_t len);
             void Final(byte *hash);
+
+            /** Initializes the SHA256 context */
+            void Init();
+
+            /** Hashes the given data and outputs the digest to byte *hash */
+            static void Hash(const byte *data, size_t len, byte *hash);
+            /** Hashes the given file and outputs the digest to byte *hash */
+            static void HashFile(const std::string &filename, byte *hash);
 
             /* Member Variables */
             byte data[SHA256_BLOCK_SIZE];

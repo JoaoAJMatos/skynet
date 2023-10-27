@@ -15,50 +15,81 @@
 #include <macros.hpp>
 
 /**
- * @brief Initializes the ECDSA object.
+ * @brief Randomizes the given context with random data
+ * 
+ * @param context 
  */
-crypto::ECDSA::ECDSA() {
-      this->context_ = nullptr;
-      std::memset(this->private_key_, 0, sizeof(this->private_key_));
-      std::memset(&this->public_key_, 0, sizeof(this->public_key_));
+void crypto::ecdsa::randomize_context(Context context) {
+      int ret;
+      byte randomizer[RANDOMIZER_BUFFER_SIZE];
+      context = secp256k1_context_create(SECP256K1_CONTEXT_SIGN | SECP256K1_CONTEXT_VERIFY);
+      
+      /** Fill the randomizer buffer with random bytes */
+      if (!crypto::random::fill_random(randomizer, RANDOMIZER_BUFFER_SIZE)) {
+            throw crypto::ecdsa::Exception("Error generating randomness for the ECDSA context");
+      }
+
+      /** Randomize the context */
+      ret = secp256k1_context_randomize(context, randomizer);
+      ASSERT(ret, "Failed to randomize ECDSA context.");
 }
 
 /**
- * @brief Destroys the ECDSA object, frees the context and clears the
- *        private key.
+ * @brief Cleans up the given context
+ * 
+ * @param[i] context 
  */
-crypto::ECDSA::~ECDSA() {
-      if (this->context_ != nullptr) {
-            secp256k1_context_destroy(this->context_);
-      }
-
-      secure_memzero(this->private_key_, sizeof(this->private_key_));
+inline void crypto::ecdsa::context_cleanup(Context context) {
+      secp256k1_context_destroy(context);
 }
 
 /**
- * @brief Generates a new ECDSA key pair using Bitcoin's secp256k1
- *        library.
+ * @brief Cleans up the given key pair.
+ * 
+ * @param key_pair 
  */
-crypto::ECError crypto::ECDSA::MakeKeyPair() {
-      byte randomize[RANDOMIZER_BUFFER_SIZE];
-      int return_value;
+void crypto::ecdsa::key_pair_cleanup(KeyPair* key_pair) {
+      crypto::util::secure_memzero(key_pair->private_key, sizeof(key_pair->private_key));
+      crypto::util::secure_memzero(key_pair->public_key, sizeof(key_pair->public_key));
+      delete key_pair;
+}
 
-      /** Before we call the API functions we need to create the context */
-      this->context_ = secp256k1_context_create(SECP256K1_CONTEXT_SIGN | SECP256K1_CONTEXT_VERIFY);
-      if (!random::fill_random(randomize, sizeof(randomize))) {
-            return crypto::ECError::RANDOMNESS_ERROR;
+/**
+ * @brief Generates a new master key pair from the given seed for HD wallets
+ * 
+ * @param[i] context 
+ * @param[i] seed 
+ * @param[o] key_pair 
+ */
+void crypto::ecdsa::generate_master_key_pair(Context context, byte *seed, KeyPair* key_pair) {
+      int ret;
+      secp256k1_pubkey public_key;
+
+      /** Key Generation */
+      ret = secp256k1_ec_privkey_tweak_add(context, key_pair->private_key, seed);
+      ASSERT(ret, "Failed to derive master private key from seed.");
+
+      /** Public Key Creation */
+      ret = secp256k1_ec_pubkey_create(context, &public_key, key_pair->private_key);
+      ASSERT(ret, "Failed to derive public key from secret key.");
+
+      /** Serialize Public Key */
+      size_t output_len = COMPRESSED_PUBLIC_KEY_SIZE;
+      if (!secp256k1_ec_pubkey_serialize(context, key_pair->public_key, &output_len, &public_key, SECP256K1_EC_COMPRESSED)) {
+            throw crypto::ecdsa::Exception("Error serializing ECDSA public key");
       }
+}
 
-      /** 
-       * Randomizing the context is recommended to protect against side-channel
-       * leakage according to the library documentation.
-       *
-       * See `secp256k1_context_randomize` in secp256k1.h for more information.
-       *
-       * This should never fail.
-       */
-      return_value = secp256k1_context_randomize(this->context_, randomize);
-      ASSERT(return_value, "Failed to randomize ECDSA context.");
+/**
+ * @brief Generates a new ECDSA key pair
+ * 
+ * @param[i] Context  The ECDSA context
+ * @param[o] KeyPair* The destination key pair 
+ * @throws crypto::ecdsa::Exception
+ */
+void crypto::ecdsa::generate_key_pair(Context context, KeyPair* key_pair) {
+      int ret;
+      secp256k1_pubkey public_key;
 
       /* Key Generation */
       /** 
@@ -67,139 +98,22 @@ crypto::ECError crypto::ECDSA::MakeKeyPair() {
        * happening is negligible. 
        */
       loop() {
-            if (!random::fill_random(this->private_key_, sizeof(this->private_key_))) 
-                  return crypto::ECError::RANDOMNESS_ERROR;
+            if (!crypto::random::fill_random(key_pair->private_key, sizeof(key_pair->private_key))) {
+                  throw crypto::ecdsa::Exception("Error generating randomness for the private key");
+            }
 
-            if (secp256k1_ec_seckey_verify(this->context_, this->private_key_)) 
-                  break;
+            if (secp256k1_ec_seckey_verify(context, key_pair->private_key)) break;
       }
 
-      /** Public key creation */
-      return_value = secp256k1_ec_pubkey_create(this->context_, &this->public_key_, this->private_key_);
-      ASSERT(return_value, "Failed to derive public key from secret key.");
+      /** Public Key Creation */
+      ret = secp256k1_ec_pubkey_create(context, &public_key, key_pair->private_key);
+      ASSERT(ret, "Failed to derive public key from secret key.");
 
-      return crypto::ECError::OK;
-}
-
-/**
- * @brief Sets the secret and public keys according to the given key
- *
- * @param private_key The private key to set
- * @return crypto::ECError The error code
- */
-crypto::ECError crypto::ECDSA::SetKey(byte *private_key) {
-      int return_value;
-
-      std::memcpy(this->private_key_, private_key, sizeof(this->private_key_));
-      if (!secp256k1_ec_seckey_verify(this->context_, this->private_key_)) {
-            return crypto::ECError::INVALID_PRIVATE_KEY;
-      }
-
-      return_value = secp256k1_ec_pubkey_create(this->context_, &this->public_key_, this->private_key_);
-      ASSERT(return_value, "Failed to derive public key from secret key.");
-
-      return crypto::ECError::OK;
-}
-
-/**
- * @brief Returns the public key in the compressed format (33 bytes)
- *
- * @param compressed_pubkey The buffer where the compressed public key will be stored
- * @return crypto::ECError The error code
- */
-crypto::ECError crypto::ECDSA::GetCompressedPublicKey(byte* compressed_pubkey) {
+      /** Serialize Public Key */
       size_t output_len = COMPRESSED_PUBLIC_KEY_SIZE;
-
-      /** Serialize the public key */
-      if (!secp256k1_ec_pubkey_serialize(this->context_, compressed_pubkey, 
-                                         &output_len, &this->public_key_, SECP256K1_EC_COMPRESSED))
-            return crypto::ECError::SERIALIZATION_ERROR;
-
-      return crypto::ECError::OK;
-}
-
-/**
- * @brief Signs the given hash using the ECDSA algorithm
- *
- * @param hash The hash to sign
- * @param signature The buffer where the signature will be stored
- * @return crypto::ECError The error code
- */
-crypto::ECError crypto::ECDSA::Sign(byte *hash, byte *signature) {
-      secp256k1_ecdsa_signature sig;
-
-      /** Sign the hash */
-      if (!secp256k1_ecdsa_sign(this->context_, &sig, hash, this->private_key_, nullptr, nullptr)) {
-            return crypto::ECError::SIGNATURE_ERROR;
+      if (!secp256k1_ec_pubkey_serialize(context, key_pair->public_key, &output_len, &public_key, SECP256K1_EC_COMPRESSED)) {
+            throw crypto::ecdsa::Exception("Error serializing ECDSA public key");
       }
-
-      /** Serialize the signature */
-      if (!secp256k1_ecdsa_signature_serialize_compact(this->context_, signature, &sig)) {
-            return crypto::ECError::SERIALIZATION_ERROR;
-      }
-
-      return crypto::ECError::OK;
-}
-
-/**
- * @brief Verifies the given signature against the given hash and public key
- *
- * @param hash The hash to verify
- * @param signature The signature to verify
- * @param pubkey The public key to verify
- * @return ECError The error code
- */
-crypto::ECError crypto::ECDSA::Verify(byte *hash, byte *signature, byte *pubkey) {
-      secp256k1_pubkey public_key;
-      secp256k1_ecdsa_signature sig;
-
-      /** Parse the public key */
-      if (!secp256k1_ec_pubkey_parse(this->context_, &public_key, pubkey, COMPRESSED_PUBLIC_KEY_SIZE)) {
-            return crypto::ECError::PUBKEY_PARSE_ERROR;
-      }
-
-      /** Parse the signature */
-      if (!secp256k1_ecdsa_signature_parse_compact(this->context_, &sig, signature)) {
-            return crypto::ECError::SIGNATURE_PARSE_ERROR;
-      }
-
-      /** Verify the signature */
-      if (!secp256k1_ecdsa_verify(this->context_, &sig, hash, &public_key)) {
-            return crypto::ECError::SIGNATURE_ERROR;
-      }
-
-      return crypto::ECError::OK;
-}
-
-/**
- * @brief Returns the error string for the given error code
- *
- * @param error The error code
- * @return std::string The error string
- */
-std::string crypto::ECErrorToString(crypto::ECError error) {
-      switch (error) {
-            case crypto::ECError::OK:
-                  return "OK";
-            case crypto::ECError::RANDOMNESS_ERROR:
-                  return "Failed to generate random data";
-            case crypto::ECError::CONTEXT_RANDOMIZE_ERROR:
-                  return "Failed to randomize ECDSA context";
-            case crypto::ECError::INVALID_PRIVATE_KEY:
-                  return "Invalid private key";
-            case crypto::ECError::SERIALIZATION_ERROR:
-                  return "Failed to serialize data";
-            case crypto::ECError::SIGNATURE_ERROR:
-                  return "Failed to sign data";
-            case crypto::ECError::SIGNATURE_INVALID:
-                  return "Invalid signature";
-            case crypto::ECError::PUBKEY_PARSE_ERROR:
-                  return "Failed to parse public key";
-            case crypto::ECError::SIGNATURE_PARSE_ERROR:
-                  return "Failed to parse signature";
-            case crypto::ECError::KEY_ERROR:
-                  return "Failed to derive public key from secret key";
-      } // No default case to force compiler warning if a new error is added
 }
 
 // MIT License

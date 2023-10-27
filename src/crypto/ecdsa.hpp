@@ -19,12 +19,13 @@
 
 /* Skynet includes */
 #include <types.hpp>
+#include <crypto/bip39.hpp>
 
 /* C++ includes */
 #include <string>
+#include <stdexcept>
 
-
-namespace crypto
+namespace crypto::ecdsa
 {
       /* CONSTANTS */
       constexpr int PRIVATE_KEY_SIZE = 32;
@@ -33,57 +34,109 @@ namespace crypto
       constexpr int SERIALIZED_SIGNATURE_SIZE = 64;   // Serialized signature size
       constexpr int SIGNATURE_SIZE = 72;              // Signature size
 
-      /** Seed size for hierarchical deterministic wallet */
-      constexpr int HD_WALLET_SEED_SIZE = 64;
+      /** Type Aliases */
+      using Context = secp256k1_context*;
+      using Seed = byte[64];
+      using Signature  = byte[SERIALIZED_SIGNATURE_SIZE];
+      using PrivateKey = byte[PRIVATE_KEY_SIZE];
+      using PublicKey  = byte[COMPRESSED_PUBLIC_KEY_SIZE];
 
-      /** Generates a new seed for a hierarchical deterministic wallet */
-      void generate_hd_wallet_seed(byte *seed);
-
-      /** Return values for the ECDSA functions */
-      enum ECError
-      {
-            OK = 0,                       // No error
-            RANDOMNESS_ERROR = 1,         // Failed to generate randomness for creating the key pair
-            CONTEXT_RANDOMIZE_ERROR = 2,  // Failed to randomize the context
-            INVALID_PRIVATE_KEY = 3,      // Private key is invalid
-            SERIALIZATION_ERROR = 4,      // Error serializing the public key
-            PUBKEY_PARSE_ERROR = 5,       // Error parsing the public key
-            SIGNATURE_ERROR = 6,          // Error signing hash with the given key 
-            SIGNATURE_PARSE_ERROR = 7,    // Error parsing the signature
-            SIGNATURE_INVALID = 8,        // Signature is invalid
-            KEY_ERROR = 9                 // Error setting the key
+      /**
+       * @brief ECDSA Key Pair structure
+       *
+       * @details This structure holds the private and public keys
+       *          for an ECDSA key pair.
+       */
+      struct KeyPair {
+            PrivateKey private_key = {0};
+            PublicKey  public_key  = {0};
       };
 
-      class ECDSA
-      {
+      /**
+       * @brief ECDSA exception class
+       */
+      class Exception : public std::exception {
       public:
-            ECDSA();
-            ~ECDSA();
-
-            /* Generates a new ECDSA key pair */
-            ECError MakeKeyPair();
-            /* Sets the ECDSA secret and public keys given a secret key */
-            ECError SetKey(byte *private_key);
-            /* Signs a hash using the private key */
-            ECError Sign(byte *hash, byte *signature);
-            /* Verifies a signature using the public key */
-            ECError Verify(byte *hash, byte *signature, byte *pubkey);
-
-            /* Getters */
-            byte *GetPrivateKey();
-            ECError GetCompressedPublicKey(byte* pubkey);
+            Exception(char* msg) : message(msg) {}
+            char* what() { return message; }
       private:
-            /* Member Variables */
-            byte private_key_[PRIVATE_KEY_SIZE];
-            secp256k1_pubkey public_key_;
-            secp256k1_context *context_;
+            char* message;
       };
 
-      /** Converts an ECError to a string */
-      std::string ECErrorToString(ECError error);
-}
+      /**
+       * @brief Randomizes the given context
+       * 
+       * @param[i] context
+       * @throws crypto::ecdsa::Exception
+       */
+      void randomize_context(Context context);
 
-#endif // !#ifndef SKYNET_CRYPTO_ECDSA_HPP
+      /**
+       * @brief Cleans up the given context
+       * 
+       * @param[i] context 
+       */
+      void context_cleanup(Context context);
+
+      /** 
+       * @brief Cleans up the KeyPair struct to clear secrets from memory 
+       */
+      void key_pair_cleanup(KeyPair* key_pair);
+
+      /** 
+       * @brief Generates a new master key pair for a hierarchical deterministic wallet 
+       * 
+       * @param[i] context The ECDSA context
+       * @param[i] seed The seed to be used for the key pair generation
+       * @param[o] key_pair The output key pair
+       * @throws crypto::ecdsa::Exception
+       */
+      void generate_master_key_pair(Context context, byte *seed, KeyPair* key_pair);
+
+      /**
+       * @brief Generates a new ECDSA key pair
+       * 
+       * @param[i] context The ECDSA context
+       * @throws crypto::ecdsa::Exception
+       */
+      void generate_key_pair(Context context, KeyPair* key_pair);
+
+      /**
+       * @brief Generates a new child key pair from the given master key pair
+       * 
+       * @param context 
+       * @param master_key_pair 
+       * @param child_key_pair 
+       * @param index
+       */
+      void generate_child_key_pair_from_master(Context context, KeyPair* master_key_pair, KeyPair* child_key_pair, int index);
+
+      /**
+       * @brief Sign the given message using the provided key
+       * 
+       * @param context 
+       * @param key_pair 
+       * @param message 
+       * @param signature 
+       * @throws crypto::ecdsa::Exception
+       */
+      void sign(Context context, KeyPair* key_pair, byte* message, Signature signature);
+
+      /**
+       * @brief Verifies a signature using the given public key
+       * 
+       * @param context 
+       * @param message 
+       * @param signature 
+       * @param public_key 
+       * @return true 
+       * @return false 
+       */
+      bool verify(Context context, byte* message, Signature signature, PublicKey public_key);
+
+} // namespace crypto::ecdsa
+
+#endif // #ifndef SKYNET_CRYPTO_ECDSA_HPP
 
 // MIT License
 // 

@@ -91,7 +91,7 @@ namespace crypto::random
        * @param size The size of the buffer.
        * @return int 1 if the operation was successful, 0 otherwise.
        */
-      static int fill_random(byte* data, size_t size) {
+      int fill_random(byte* data, size_t size) {
 #if defined(_WIN32)
             if (BCryptGenRandom(NULL, data, size, BCRYPT_USE_SYSTEM_PREFERRED_RNG) != STATUS_SUCCESS) {
                   return 0;
@@ -114,7 +114,6 @@ namespace crypto::random
 #endif
             return 1;
       }
-
 } // namespace random
 
 #endif // SKYNET_RANDOM_HPP
