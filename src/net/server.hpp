@@ -54,7 +54,7 @@ namespace net
             /** Launch must implement the server bootstrap procedure */
             virtual void Launch() = 0;
             /** Accept should accept new connections */
-            virtual bool Accept() = 0;
+            virtual void Accept() = 0;
             /** Shutdown should implement the shutdown procesure of the server */
             virtual void Shutdown() = 0;
       protected:
