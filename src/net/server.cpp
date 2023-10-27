@@ -51,6 +51,7 @@ void net::Server::Run() {
  *        Stops the server loop.
  */
 void net::Server::Stop() {
+      this->Shutdown();
 	this->shouldStop = true;
 }
 
