@@ -29,10 +29,14 @@ namespace skynet
        */
       struct OutputMap
       {
-            byte recipient[crypto::COMPRESSED_PUBLIC_KEY_SIZE];  /** The recipients wallet address */
+            crypto::ecdsa::PublicKey recipient;                  /** The recipients wallet address */
             int amount;                                          /** The amount of coins to be sent */
-            byte sender[crypto::COMPRESSED_PUBLIC_KEY_SIZE];     /** The sender's wallet address */
+            crypto::ecdsa::PublicKey sender;                     /** The sender's wallet address */
             int balance;                                         /** The sender's balance after the transaction */
+
+            /** Serializing/Deserializing */
+            void ToBytes(byte *bytes);
+            void FromBytes(byte *bytes);
       };
 
       /**
@@ -47,8 +51,12 @@ namespace skynet
       {
             time_t timestamp;                                    /** The timestamp of the transaction */
             int balance;                                         /** The sender's balance before the transaction */
-            byte sender[crypto::COMPRESSED_PUBLIC_KEY_SIZE];     /** The sender's wallet address */
-            byte signature[crypto::SIGNATURE_SIZE];              /** The transaction's digital signature */
+            crypto::ecdsa::PublicKey sender;                     /** The sender's wallet address */
+            crypto::ecdsa::Signature signature;                  /** The transaction's digital signature */
+
+            /** Serializing/Deserializing */
+            void ToBytes(byte *bytes);
+            void FromBytes(byte *bytes);
       };
 
       /**
@@ -61,25 +69,48 @@ namespace skynet
             Transaction(InputMap input_map, OutputMap output_map);
             ~Transaction();
 
-            /** Signs the transaction with the sender's private key */
-            void Sign(byte *private_key);
-            /** Checks if a transaction is valid */
+            /**
+             * @brief Checks if a transaction is valid
+             * @details Validates the OutputMap and the InputMap
+             * 
+             * @return true 
+             * @return false 
+             */
             bool IsValid();
 
+            /**
+             * @brief Returns the formatted string representation of a transaction
+             * 
+             * @return std::string 
+             */
             std::string ToString() const;
 
             /** Getters */
             [[nodiscard]] InputMap GetInputMap() const { return input_map; }
             [[nodiscard]] OutputMap GetOutputMap() const { return output_map; }
-            void GetID(byte *id) { memcpy(id, this->id, crypto::SHA256_HASH_SIZE); }
-      private:
-            /** Get transaction hash */
-            void GetHash(byte *hash);
+            void GetID(byte *id) { memcpy(id, this->id, crypto::hashing::SHA256_HASH_SIZE); }
+            [[nodiscard]] time_t GetLocktime() const { return locktime; }
+            [[nodiscard]] float GetVersion() const { return version; }
+            [[nodiscard]] float GetFee() const { return fee; }
 
+            /**
+             * @brief Calculates the fee earnings of the miner
+             * 
+             * @return int 
+             */
+            int GetFeeEarnings();
+      private:
             InputMap input_map;
             OutputMap output_map;
-            byte id[crypto::SHA256_HASH_SIZE];
+
+            byte id[crypto::hashing::SHA256_HASH_SIZE];
+            time_t locktime;
+            float version;
+            float fee;
+
+            /** Get transaction hash */
+            void Hash(byte *hash);
       };
 }
 
-#endif // !SKYNET_TRANSACTION_HPP
+#endif // SKYNET_TRANSACTION_HPP

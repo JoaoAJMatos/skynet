@@ -25,12 +25,6 @@
 
 namespace skynet
 {
-      struct WalletAddress
-      {
-            byte address[crypto::COMPRESSED_PUBLIC_KEY_SIZE];
-            byte private_key[crypto::PRIVATE_KEY_SIZE];
-      };
-
       class Wallet
       {
       public:
@@ -49,6 +43,10 @@ namespace skynet
             /** Verifies a signature with a private key */
             bool Verify(byte *message, byte *signature, byte *public_key);
 
+            /* RECOVERING */
+            /** Recovers a Wallet from a mnemonic and a password */
+            void Recover(std::string mnemonic, std::string password);
+
             /* ADDRESSES */
             /** Generates a new address for the Wallet */
             void GenerateAddress();
@@ -60,12 +58,16 @@ namespace skynet
             uint64_t GetBalance(byte *address);
 
       private:
-            std::vector<WalletAddress> addresses;
+            /** Parent key */
+            /**
+             * @brief The master key is the key that is used to generate
+             *        all the child keys using the BIP32 algorithm.
+             */
+            crypto::ecdsa::KeyPair master;
 
-      protected:
-            /** The ECDSA object used to sign and verify data */
-            crypto::ECDSA ecdsa;
+            /** Child keys */
+            std::vector<crypto::ecdsa::KeyPair> addresses;
       };
 }
 
-#endif // !SKYNET_WALLET_HPP
+#endif // SKYNET_WALLET_HPP

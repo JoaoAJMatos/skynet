@@ -66,7 +66,34 @@ namespace skynet::consensus
 
             return lastDifficulty;
       }
-}
+
+namespace coinbase 
+{
+      /**
+       * @brief Creates a coinbase transaction.
+       * 
+       * @return skynet::Transaction 
+       */
+      skynet::Transaction CreateCoinbaseTransaction(int height) {
+            skynet::OutputMap output_map;
+            skynet::InputMap input_map;
+
+            output_map.recipient = crypto::ecdsa::GenerateKeyPair().public_key;
+            output_map.amount = consensus::GetBlockSubsidy(0);
+            output_map.sender = crypto::ecdsa::GenerateKeyPair().public_key;
+            output_map.balance = 0;
+
+            input_map.timestamp = util::time::timestamp();
+            input_map.balance = 0;
+            input_map.sender = crypto::ecdsa::GenerateKeyPair().public_key;
+            input_map.signature = crypto::ecdsa::GenerateKeyPair().private_key.Sign(crypto::hashing::SHA256(output_map.ToBytes(), sizeof(output_map.ToBytes())));
+
+            return skynet::Transaction(input_map, output_map);
+      }
+
+} // namespace coinbase
+
+} // namespace skynet::consensus
 
 #endif // SKYNET_CONSENSUS_HPP
 

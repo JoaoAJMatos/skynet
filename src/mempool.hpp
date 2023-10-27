@@ -42,7 +42,8 @@ namespace skynet
             Transaction GetTransactionWithHash(byte *hash);
 
             /** Returns the size of the mempool */
-            int GetSize();
+            int Size();
+            std::vector<Transaction> Transactions();
 
       private:
             std::vector<Transaction> transactions;
