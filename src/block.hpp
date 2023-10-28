@@ -27,14 +27,23 @@
 
 namespace skynet
 {
-      typedef struct {
+      struct BlockHeader {
             float version;                /** Version of the blockchain when the block was created */
             byte* previousHash;           /** Hash of the previous block */
             byte* merkleRoot;             /** Merkle root of the block */
             uint64_t timestamp;           /** Timestamp of the block */
             int difficultyTarget;         /** Difficulty target of the block */
             int nonce;                    /** Nonce of the block */
-      } BlockHeader;
+
+            BlockHeader(float version, byte* previousHash, byte* merkleRoot, uint64_t timestamp, int difficultyTarget, int nonce) {
+                  this->version = version;
+                  this->previousHash = previousHash;
+                  this->merkleRoot = merkleRoot;
+                  this->timestamp = timestamp;
+                  this->difficultyTarget = difficultyTarget;
+                  this->nonce = nonce;
+            }
+      };
 
       class Block
       {
@@ -42,32 +51,70 @@ namespace skynet
             Block() = default;
             ~Block() = default;
 
-            /** Returns the formatted string representation of a block */
-            std::string ToString() const;
-            /** Returns the hash of the block */
+            
+            /** 
+             * @brief Returns the hash of the block
+             * 
+             * @return byte* The hash of the block 
+             */
             byte* Hash() const;
 
-            /** Returns the block's headers */
+            /** 
+             * @brief Adds a transaction to the Block
+             * 
+             * @param transaction The transaction to be added 
+             */
+            void AddTransaction(Transaction transaction);
+
+            /** Getters */
             BlockHeader GetHeaders() const;
-            /** Returns the block's transactions */
             std::vector<Transaction> GetTransactions() const;
-            /** Returns the block's size */
             int GetSize() const;
+
+            /** 
+             * @brief Returns the formatted string representation of a block 
+             * 
+             * @return std::string The formatted string representation of a block
+             */
+            std::string ToString() const;
+
       private:
             BlockHeader headers;                      /** Block headers */
             std::vector<Transaction> transactions;    /** Transactions in the block */
             int size;                                 /** Size of the block in bytes */
       };
 
-      /* Returns the Genesis block of the Blockchain */
+
+      /**
+       * @brief Returns the Genesis block of the Blockchain
+       * 
+       * @return Block The Genesis block
+       */
       inline Block GenesisBlock();
-      /* Returns the Genesis block header of the Blockchain */
-      BlockHeader GenesisBlockHeader();
-      /** Make block header with the given params */
-      BlockHeader MakeBlockHeader(float version, byte* previousHash, byte* merkleRoot, uint64_t timestamp, int difficultyTarget, int nonce);
 
 } // namespace skynet
 
-#endif // !SKYNET_BLOCK_HPP
+#endif // SKYNET_BLOCK_HPP
 
+// MIT License
+// 
+// Copyright (c) 2023 João Matos
+// 
+// Permission is hereby granted, free of charge, to any person obtaining a copy
+// of this software and associated documentation files (the "Software"), to deal
+// in the Software without restriction, including without limitation the rights
+// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+// copies of the Software, and to permit persons to whom the Software is
+// furnished to do so, subject to the following conditions:
+// 
+// The above copyright notice and this permission notice shall be included in all
+// copies or substantial portions of the Software.
+// 
+// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+// SOFTWARE.
 
