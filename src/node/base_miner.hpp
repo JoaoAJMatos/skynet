@@ -18,6 +18,7 @@
 
 /** C++ Includes */
 #include <functional>
+#include <memory>
 
 namespace skynet
 {
@@ -34,16 +35,13 @@ namespace skynet
              * @param mempool 
              * @param callback 
              */
-            Miner(MemPool* mempool, Chain* chain, std::function<void(Block)> callback) 
-                  : mempool(mempool), chain(chain), callback(callback) 
-            {
-
-            }
+            Miner(std::shared_ptr<MemPool> mempool, std::shared_ptr<Chain> chain, std::function<void(Block)> callback)
+                : mempool(mempool), chain(chain), callback(callback) { }
 
             /**
              * @brief Destroy the Miner object
              */
-            virtual ~Miner() {}
+            virtual ~Miner() { }
 
             /**
              * @brief Mines a block
@@ -53,8 +51,8 @@ namespace skynet
              */
             virtual void Mine();
       private:
-            MemPool* mempool;
-            Chain* chain;
+            std::shared_ptr<MemPool> mempool;
+            std::shared_ptr<Chain> chain;
             std::function<void(Block)> callback;
       };
 } // namespace skynet
