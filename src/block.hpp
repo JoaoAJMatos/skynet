@@ -48,7 +48,7 @@ namespace skynet
       class Block
       {
       public:
-            Block() = default;
+            Block();
             ~Block() = default;
 
             
