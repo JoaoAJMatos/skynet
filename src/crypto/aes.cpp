@@ -1,6 +1,7 @@
 /** C++ Includes */
 #include <cstring>
 #include <stdexcept>
+#include <cmath>
 
 /** Local Includes */
 #include "aes.hpp"
