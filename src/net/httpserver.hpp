@@ -5,9 +5,24 @@
  * @brief   This header file defines the HTTP server that Skynet uses.
  *
  * @date    2023-09-28
- * 
  * @copyright Copyright (c) 2023
  * @license MIT
+ * 
+ * @example
+ * 
+ * #include <net/httpserver.hpp>
+ * 
+ * net::HTTPResponse home_handler(net::HTTPRequest request) {
+ *   return net::HTTPResponse(net::HTTPStatusCode::OK, "Hello World!", {});
+ * }
+ * 
+ * int main() {
+ *    net::HTTPServer server(net::HTTP_PORT);
+ *    server.RegisterHandler("/", home_handler);
+ *    server.Run();
+ * 
+ *   return 0;
+ * }
  */
 
 #ifndef SKYNET_HTTPSERVER_HPP
