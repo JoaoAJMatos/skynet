@@ -1,51 +1,43 @@
+//
+// Created by JoaoAJMatos on 29/10/2023.
+//
+
+/** C++ includes */
+#include <chrono>
+
+/** Local Includes */
+#include "time.hpp"
+
 /**
- * @file   time.hpp
- * @author JoaoAJMatos
- *
- * @brief  This header file contains functions related to time. 
- *
- * @version 0.1
- * @date 2023-10-29
- * @license MIT
- * @copyright Copyright (c) 2023
- */
-
-#ifndef SKYNET_TIME_HPP
-#define SKYNET_TIME_HPP
-
-/* C++ includes */
-#include <ctime>
-#include <string>
-
-namespace util::time
-{
-      constexpr const char* DATETIME_FORMAT = "%Y-%m-%d %H:%M:%S";
-
-      /**
-       * @brief Returns the current timestamp
-       * 
-       * @return std::time_t The current timestamp
-       */
-      std::time_t timestamp();
-
-      /**
-       * @brief Returns the current datetime as a string
-       * 
-       * @return std::string The datetime string
-       */
-      std::string datetime();
-
-      /**
-       * @brief Returns the current datetime as a string
-       * 
-       * @param std::time_t timestamp The timestamp to convert
-       * @param const char* format The format of the datetime string
-       * @return std::string The datetime string
-       */
-      std::string timestamp_to_datetime_string(std::time_t timestamp, const char* format);
+* @brief Returns the current timestamp
+* 
+* @return std::time_t The current timestamp
+*/
+std::time_t util::time::timestamp() {
+      return std::chrono::system_clock::to_time_t(std::chrono::system_clock::now());      
 }
 
-#endif // SKYNET_TIME_HPP
+/**
+* @brief Returns the current datetime as a string
+* 
+* @return std::string The datetime string
+*/
+std::string util::time::datetime() {
+      return timestamp_to_datetime_string(timestamp(), DATETIME_FORMAT);
+}
+
+/**
+* @brief Returns the current datetime as a string
+* 
+* @param std::time_t timestamp The timestamp to convert
+* @param const char* format The format of the datetime string
+* @return std::string The datetime string
+*/
+std::string util::time::timestamp_to_datetime_string(std::time_t timestamp, const char* format) {
+      char buffer[80];
+      std::strftime(buffer, 80, format, std::localtime(&timestamp));
+      return std::string(buffer);
+}
 
 // MIT License
 // 
@@ -68,4 +60,3 @@ namespace util::time
 // LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
-
