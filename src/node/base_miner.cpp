@@ -15,16 +15,15 @@
  * @return std::vector<skynet::Transaction> 
  */
 static std::vector<skynet::Transaction> select_transactions(skynet::MemPool &mempool) {
-      std::vector<skynet::Transaction> mempool_transactions = mempool.Transactions();
       std::vector<skynet::Transaction> selected_transactions;
 
       /** Order the transactions by fee returns */
-      std::sort(mempool_transactions.begin(), mempool_transactions.end(), [](skynet::Transaction &a, skynet::Transaction &b) {
+      std::sort(mempool.begin(), mempool.end(), [](skynet::Transaction &a, skynet::Transaction &b) {
             return a.GetFeeEarnings() > b.GetFeeEarnings();
       });
 
       /** Pick the ones whose locktime is less than the current timestamp */
-      for (auto &transaction : mempool_transactions) {
+      for (auto &transaction : mempool) {
             if (transaction.GetLocktime() < util::time::timestamp()) {
                   selected_transactions.push_back(transaction);
             }
@@ -56,7 +55,9 @@ void skynet::Miner::Mine() {
 
       /** Remove the transactions from the mempool */
       for (auto &transaction : selected_transactions) {
-            mempool->RemoveTransaction(transaction);
+            TransactionID id;
+            transaction.GetID(id);
+            mempool->RemoveTransaction(id);
       }
 }
 
