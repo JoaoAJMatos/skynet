@@ -15,6 +15,7 @@
 /* C++ Includes */
 #include <stdexcept>
 #include <vector>
+#include <memory>
 
 /* Skynet Includes */
 #include <transaction.hpp>
@@ -27,23 +28,49 @@ namespace skynet
             MemPool() {}
             ~MemPool() {}
 
-            /** Adds a transaction to the mempool */
+            /** Iterators */
+            std::vector<Transaction>::iterator begin() { return transactions.begin(); }
+            std::vector<Transaction>::iterator end() { return transactions.end(); }
+
+            /** 
+             * @brief Adds a transaction to the mempool 
+             *
+             * @param transaction The transaction to be added 
+             */
             void AddTransaction(Transaction transaction);
-            /** Removes a transaction from the mempool */
-            void RemoveTransaction(Transaction transaction);
-            /** Removes a transaction from the mempool at a given index */
-            void RemoveTransactionAt(int index);
-            /** Clears the mempool */
-            void Clear();
+            
+            /** 
+             * @brief Removes a transaction from the mempool
+             * 
+             * @param transaction_id The ID of the transaction to be removed
+             * @throws std::runtime_error If the transaction is not found
+             */
+            void RemoveTransaction(TransactionID transaction_id);
 
-            /** Returns a transaction at a given index */
-            Transaction GetTransactionAt(int index);
-            /** Returns a transaction with a given hash */
-            Transaction GetTransactionWithHash(byte *hash);
+            /** 
+             * @brief Returns a transaction with a given ID 
+             * 
+             * @param transaction_id The ID of the transaction to be returned
+             * @return Transaction The transaction with the given ID
+             */
+            Transaction GetTransaction(TransactionID transaction_id);
 
-            /** Returns the size of the mempool */
-            int Size();
-            std::vector<Transaction> Transactions();
+            /** 
+             * @brief Get the vector of transactions
+             * 
+             * @return std::vector<Transaction> The vector of transactions 
+             */
+            std::vector<Transaction> GetTransactions() const { return transactions; }
+
+            /** 
+             * @brief Returns the size of the mempool 
+             */
+            int size() const { return transactions.size(); }
+
+            /** 
+             * @brief Returns true if the mempool is empty, false otherwise 
+             */
+            bool empty() const { return transactions.empty(); }
 
       private:
             std::vector<Transaction> transactions;
