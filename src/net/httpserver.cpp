@@ -111,6 +111,8 @@ std::string net::HTTPMethodToString(HTTPMethod method) {
       case HTTPMethod::CONNECT: return "CONNECT";
       case HTTPMethod::TRACE: return "TRACE";
       } // No default case to force compiler warning on missing cases
+
+      return "";
 }
 
 /**
@@ -158,6 +160,8 @@ std::string net::HTTPStatusCodeMessage(HTTPStatusCode status_code) {
       case HTTPStatusCode::BAD_GATEWAY : return "Bad Gateway";
       case HTTPStatusCode::SERVICE_UNAVAILABLE : return "Service Unavailable";
       } // No default case to force compiler warning on missing cases
+
+      return "";
 }
 
 /**
