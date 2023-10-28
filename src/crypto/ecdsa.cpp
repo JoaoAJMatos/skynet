@@ -66,7 +66,7 @@ void crypto::ecdsa::generate_master_key_pair(Context context, byte *seed, KeyPai
       secp256k1_pubkey public_key;
 
       /** Key Generation */
-      ret = secp256k1_ec_privkey_tweak_add(context, key_pair->private_key, seed);
+      ret = secp256k1_ec_seckey_tweak_add(context, key_pair->private_key, seed);
       ASSERT(ret, "Failed to derive master private key from seed.");
 
       /** Public Key Creation */
