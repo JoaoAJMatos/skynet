@@ -312,6 +312,8 @@ std::string io::file::ErrorToString(io::file::Error error) {
             case io::file::Error::FILE_WRITE_ERROR: return "File write error";
             case io::file::Error::FILE_ALREADY_EXISTS: return "File already exists";
       } // no default case to force compiler warning
+
+      return "Unknown error";
 }
 
 // MIT License
