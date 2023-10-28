@@ -40,7 +40,7 @@
 namespace net
 {
       /** Constants */
-      constexpr int HTTP_PORT = 8080;
+      constexpr int DEFAULT_HTTP_PORT = 8080;
 
       enum class HTTPMethod
       {
