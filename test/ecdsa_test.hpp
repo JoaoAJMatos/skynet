@@ -32,23 +32,25 @@
  */
 void EcdsaTest() {
       byte data[] = "Hello World!";
-      byte hash[crypto::SHA256_HASH_SIZE];
-      byte signature[crypto::SERIALIZED_SIGNATURE_SIZE];
-      byte public_key[crypto::COMPRESSED_PUBLIC_KEY_SIZE];
-      crypto::ECError err;
+      byte hash[crypto::hashing::SHA256_HASH_SIZE];
+      byte signature[crypto::ecdsa::SERIALIZED_SIGNATURE_SIZE];
+      byte public_key[crypto::ecdsa::COMPRESSED_PUBLIC_KEY_SIZE];
 
-      /** Create a new ECDSA object */
-      crypto::ECDSA ecdsa = crypto::ECDSA();
-      ecdsa.MakeKeyPair();
+      /** Create and randomize the context */
+      crypto::ecdsa::Context context;
+      crypto::ecdsa::randomize_context(context);
+
+      /** Use the context to create the Key Pair */
+      crypto::ecdsa::KeyPair key_pair;
+      crypto::ecdsa::generate_key_pair(context, &key_pair);
 
       /** Sign the hash */
-      crypto::SHA256::Hash(data, sizeof(data), hash);
-      err = ecdsa.Sign(hash, signature);
+      crypto::hashing::SHA256(data, sizeof(data), hash);
+      crypto::ecdsa::sign(context, &key_pair, hash, signature);
       
       /** Verify the signature */
-      ecdsa.GetCompressedPublicKey(public_key);
-      err = ecdsa.Verify(hash, signature, public_key);
-      ASSERT_EQUAL(err, crypto::ECError::OK, "Failed to verify signature (" + crypto::ECErrorToString(err) + ")");
+      bool isValid = crypto::ecdsa::verify(context, signature, hash, key_pair.public_key);
+      ASSERT_TRUE(isValid, "Failed to verify signature");
 }
 
 // MIT License
