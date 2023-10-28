@@ -57,10 +57,10 @@ namespace crypto::ecdsa
        */
       class Exception : public std::exception {
       public:
-            Exception(char* msg) : message(msg) {}
-            char* what() { return message; }
+            Exception(const char* msg) : message(msg) {}
+            const char* what() { return message; }
       private:
-            char* message;
+            const char* message;
       };
 
       /**
