@@ -19,6 +19,7 @@
 
 /** C++ Includes */
 #include <vector>
+#include <memory>
 
 /** Skynet Includes */
 #include <types.hpp>
@@ -27,21 +28,38 @@
 
 namespace skynet
 {
-      struct BlockHeader {
-            float version;                /** Version of the blockchain when the block was created */
-            byte* previousHash;           /** Hash of the previous block */
-            byte* merkleRoot;             /** Merkle root of the block */
-            uint64_t timestamp;           /** Timestamp of the block */
-            int difficultyTarget;         /** Difficulty target of the block */
-            int nonce;                    /** Nonce of the block */
+      /** Constants */
+      constexpr int MAX_TRANSACTIONS_PER_BLOCK = 1000;
 
-            BlockHeader(float version, byte* previousHash, byte* merkleRoot, uint64_t timestamp, int difficultyTarget, int nonce) {
+      struct BlockHeader {
+            float version;                         /** Version of the blockchain when the block was created */
+            std::unique_ptr<byte[]> prevHash;      /** Hash of the previous block */
+            std::unique_ptr<byte[]> merkleRoot;    /** Merkle root of the block */
+            std::time_t timestamp;                 /** Timestamp of the block */
+            int difficultyTarget;                  /** Difficulty target of the block */
+            int nonce;                             /** Nonce of the block */
+
+            /** Constructors */
+            BlockHeader() = default;
+
+            BlockHeader(float version, std::unique_ptr<byte[]> prevHash, std::unique_ptr<byte[]> merkleRoot, std::time_t timestamp, int difficultyTarget, int nonce) {
                   this->version = version;
-                  this->previousHash = previousHash;
-                  this->merkleRoot = merkleRoot;
+                  this->prevHash = std::move(prevHash);
+                  this->merkleRoot = std::move(merkleRoot);
                   this->timestamp = timestamp;
                   this->difficultyTarget = difficultyTarget;
                   this->nonce = nonce;
+            }
+
+            BlockHeader(const BlockHeader &header) {
+                  version = header.version;
+                  prevHash = std::make_unique<byte[]>(crypto::hashing::SHA256_HASH_SIZE);
+                  std::copy(header.prevHash.get(), header.prevHash.get() + crypto::hashing::SHA256_HASH_SIZE, prevHash.get());
+                  merkleRoot = std::make_unique<byte[]>(crypto::hashing::SHA256_HASH_SIZE);
+                  std::copy(header.merkleRoot.get(), header.merkleRoot.get() + crypto::hashing::SHA256_HASH_SIZE, merkleRoot.get());
+                  timestamp = header.timestamp;
+                  difficultyTarget = header.difficultyTarget;
+                  nonce = header.nonce;
             }
       };
 
@@ -49,27 +67,24 @@ namespace skynet
       {
       public:
             Block();
+            Block(BlockHeader header, std::vector<Transaction> transactions);
             ~Block() = default;
 
-            
+
             /** 
              * @brief Returns the hash of the block
-             * 
-             * @return byte* The hash of the block 
+             *
+             * @return std::unique_ptr<byte[]> The hash of the block 
              */
-            byte* Hash() const;
+            std::unique_ptr<byte[]> Hash() const;
 
             /** 
              * @brief Adds a transaction to the Block
              * 
-             * @param transaction The transaction to be added 
+             * @param transaction The transaction to be added
+             * @throws std::runtime_error If the block is full
              */
             void AddTransaction(Transaction transaction);
-
-            /** Getters */
-            BlockHeader GetHeaders() const;
-            std::vector<Transaction> GetTransactions() const;
-            int GetSize() const;
 
             /** 
              * @brief Returns the formatted string representation of a block 
@@ -78,19 +93,36 @@ namespace skynet
              */
             std::string ToString() const;
 
+            /**
+            * @brief Returns the Genesis block of the Blockchain
+            * 
+            * @return Block The Genesis block
+            */
+            static Block GenesisBlock();
+
+            /** Getters */
+            BlockHeader GetHeader() const { return header; }
+            std::vector<Transaction> GetTransactions() const { return transactions; }
+            int GetTransactionCount() const { return transactionCount; }
+
+            /** Setters */
+            void SetHeader(BlockHeader header) { this->header = header; }
+            void SetTransactions(std::vector<Transaction> transactions) { this->transactions = transactions; }
+
       private:
-            BlockHeader headers;                      /** Block headers */
+            BlockHeader header;                       /** The block header */
             std::vector<Transaction> transactions;    /** Transactions in the block */
-            int size;                                 /** Size of the block in bytes */
+            int transactionCount;                     /** Number of transactions in the block */
       };
 
-
       /**
-       * @brief Returns the Genesis block of the Blockchain
+       * @brief Calculates the Merkle Root of a vector of transactions
        * 
-       * @return Block The Genesis block
+       * @param transactions The vector of transactions
+       * @return std::unique_ptr<byte[]> The Merkle Root of the vector of transactions
+       * @throws std::runtime_error If the vector of transactions is empty
        */
-      inline Block GenesisBlock();
+      std::unique_ptr<byte[]> CalculateMerkleRoot(std::vector<Transaction> transactions);
 
 } // namespace skynet
 
