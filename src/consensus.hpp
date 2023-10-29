@@ -19,24 +19,27 @@
 
 namespace skynet::consensus
 {
-      /** The version of the blockchain */
+      /** [ BLOCKCHAIN ] */
       constexpr float VERSION = 1.0;
-      /** The initial block difficulty */
-      constexpr int INITIAL_DIFFICULTY = 1;
-      /** The Mining rate (blocks/hour) */
-      constexpr int MINING_RATE = 60;
-      /** Halving frequency */
-      constexpr int DIFFICULTY_ADJUSTMENT_INTERVAL = 2016;
-      /** The initial block subsidy */
-      constexpr int INITIAL_SUBSIDY = 50;
-      /** The maximum amount of transactions per block */
-      constexpr int MAX_TRANSACTIONS_PER_BLOCK = 10;
-      /** The maximum block size in bytes */
-      constexpr int MAX_BLOCK_SIZE = 1000000;
-      /** Max coins in a transaction */
-      constexpr int MAX_COINS_PER_TRANSACTION = 1000000;
-      /** Coin */
+      constexpr int MAINNET_ADDRESS_PREFIX = 0x00;         /** The prefix of the mainnet addresses */
+      constexpr int TESTNET_ADDRESS_PREFIX = 0x6F;         /** The prefix of the testnet addresses */
+
+      /** [ MINING ] */
+      constexpr int INITIAL_DIFFICULTY = 5;                /** The initial block difficulty */
+      constexpr int MINING_RATE = 60;                      /** The Mining rate (blocks/hour) */
+      constexpr int INITIAL_DIFFICULTY = 1;                /** The initial block difficulty */
+      constexpr int DIFFICULTY_ADJUSTMENT_INTERVAL = 2016; /** Halving frequency */
+      constexpr int INITIAL_SUBSIDY = 50;                  /** The initial block subsidy */
+
+      /** [ BLOCKS ] */
+      constexpr int MAX_TRANSACTIONS_PER_BLOCK = 6000;     /** The maximum amount of transactions per block */
+      
+      /** [ COIN ] */
       constexpr int COIN = 100000000; // 1 SKY = 100000000 COINS
+
+      /** [ TRANSACTIONS ] */
+      constexpr int MAX_COIN_TRANSFER = 21000000;          /** The maximum amount of coins that can be transferred in a transaction */
+
 
       /**
        * @brief Returns the mining reward of a block at a given height
@@ -69,8 +72,14 @@ namespace skynet::consensus
 
 namespace coinbase 
 {
+
       /**
        * @brief Creates a coinbase transaction.
+       * 
+       * @details The coinbase transaction is the first transaction in a block.
+       *          It is created by the miner and it is the only transaction that
+       *          does not have any inputs. It is used to reward the miner for
+       *          mining the block.
        * 
        * @return skynet::Transaction 
        */
@@ -78,16 +87,8 @@ namespace coinbase
             skynet::OutputMap output_map;
             skynet::InputMap input_map;
 
-            output_map.recipient = crypto::ecdsa::GenerateKeyPair().public_key;
-            output_map.amount = consensus::GetBlockSubsidy(0);
-            output_map.sender = crypto::ecdsa::GenerateKeyPair().public_key;
-            output_map.balance = 0;
-
-            input_map.timestamp = util::time::timestamp();
-            input_map.balance = 0;
-            input_map.sender = crypto::ecdsa::GenerateKeyPair().public_key;
-            input_map.signature = crypto::ecdsa::GenerateKeyPair().private_key.Sign(crypto::hashing::SHA256(output_map.ToBytes(), sizeof(output_map.ToBytes())));
-
+            // TODO: Add the coinbase transaction logic
+            
             return skynet::Transaction(input_map, output_map);
       }
 
