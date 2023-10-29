@@ -62,7 +62,7 @@ namespace crypto::encoding::base58check
        */
       std::vector<byte> DecodeAddress(std::string address, int* version);
 
-} // namespace crypto::encoding
+} // namespace crypto::encoding::base58check
 
 #endif //SKYNET_BASE58_CHECK_HPP
 
