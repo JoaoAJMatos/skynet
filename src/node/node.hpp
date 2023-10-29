@@ -71,8 +71,7 @@ namespace skynet
 
             /** Getters */
             [[nodiscard]] NodeType GetType() const { return type; }
-            [[nodiscard]] NodeServer *GetServer() const { return server; }
-            [[nodiscard]] NodeClient *GetClient() const { return client; }
+            [[nodiscard]] std::shared_ptr<Miner> GetMiner() const { return miner; }
 
             /** Setters */
             void SetMiner(std::shared_ptr<Miner> miner) { this->miner = miner; }
@@ -93,8 +92,9 @@ namespace skynet
             void SyncWithPeers();
 
             NodeType type;
-            NodeServer *server;
-            NodeClient *client;
+            
+            std::unique_ptr<NodeServer> server;
+            std::unique_ptr<NodeClient> client;
 
             std::shared_ptr<Miner> miner;
       };
