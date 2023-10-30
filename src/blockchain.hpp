@@ -36,20 +36,22 @@ namespace skynet
             /* BLOCKCHAIN OPERATIONS */
             /** Adds a block to the Blockchain */
             void AddBlock(Block block);
-            /** Returns the last block in the Blockchain */
-            Block GetLastBlock();
-            /** Returns the size of the Blockchain */
-            int Size();
-            /** Returns the Blocks in the Blockchain */
-            std::vector<Block> Blocks();
 
             /* BLOCKCHAIN VALIDATION */
             /** Validates the Blockchain */
             bool IsValid();
 
+            /* BLOCKCHAIN GETTERS */
+            /** Returns the Blocks in the Blockchain */
+            std::vector<Block> GetBlocks();
+            /** Returns the last block in the Blockchain */
+            Block GetLastBlock();
+            /** Returns the size of the Blockchain */
+            int Size();
+
       private:
             std::string name;
-            std::vector<Block> blocks;
+            std::vector<std::unique_ptr<Block>> blocks;
 
             /* BLOCKCHAIN FILES */
             /** Load a Blockchain from a file */
