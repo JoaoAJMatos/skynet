@@ -43,25 +43,6 @@ namespace crypto::encoding::base58check
        */
       std::vector<byte> Decode(std::string data);
 
-      /**
-       * @brief Encodes a Skynet address to a Base58Check string
-       * 
-       * @param address The address to be encoded
-       * @param version The version of the address (check consensus.hpp for more info)
-       * @return std::string The Base58Check encoded string
-       */
-      std::string EncodeAddress(std::vector<byte> address, int version);
-
-      /**
-       * @brief Decodes a Base58Check string to a Skynet address
-       * 
-       * @param[i] address The Base58Check encoded string
-       * @param[o] version The version of the decoded address (check consensus.hpp for more info)
-       * @return std::vector<byte> The decoded address
-       * @throws std::invalid_argument If the Base58Check string is invalid
-       */
-      std::vector<byte> DecodeAddress(std::string address, int* version);
-
 } // namespace crypto::encoding::base58check
 
 #endif //SKYNET_BASE58_CHECK_HPP

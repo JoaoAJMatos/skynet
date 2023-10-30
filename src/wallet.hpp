@@ -55,7 +55,7 @@ namespace skynet
             /** Returns the total balance of the Wallet */
             uint64_t GetBalance();
             /** Returns the balance of a given address in the Wallet */
-            uint64_t GetBalance(byte *address);
+            uint64_t GetBalance(PuclicKey address);
 
       private:
             /** Parent key */
@@ -68,6 +68,26 @@ namespace skynet
             /** Child keys */
             std::vector<crypto::ecdsa::KeyPair> addresses;
       };
+
+      /**
+       * @brief Encodes a Skynet address to a Base58Check string
+       * 
+       * @param address The address to be encoded
+       * @param version The version of the address (check consensus.hpp for more info)
+       * @return std::string The Base58Check encoded string
+       */
+      std::string EncodeAddress(std::vector<byte> address, int version);
+
+      /**
+       * @brief Decodes a Base58Check string to a Skynet address
+       * 
+       * @param[i] address The Base58Check encoded string
+       * @param[o] version The version of the decoded address (check consensus.hpp for more info)
+       * @return std::vector<byte> The decoded address
+       * @throws std::invalid_argument If the Base58Check string is invalid
+       */
+      std::vector<byte> DecodeAddress(std::string address, int* version);
+
 }
 
 #endif // SKYNET_WALLET_HPP

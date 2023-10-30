@@ -134,36 +134,6 @@ std::vector<byte> crypto::encoding::base58check::Decode(std::string data) {
       }
 }
 
-//////////////////////////////////////////////////////////////////////////////////////////////
-
-/**
-* @brief Encodes a Skynet address to a Base58Check string
-* 
-* @param address The address to be encoded
-* @param version The version of the address (check consensus.hpp for more info)
-* @return std::string The Base58Check encoded string
-*/
-std::string crypto::encoding::base58check::EncodeAddress(std::vector<byte> address, int version) {
-      std::vector<byte> data;
-      data.push_back(version);
-      data.insert(data.end(), address.begin(), address.end());
-      return Encode(data);
-}
-
-/**
-* @brief Decodes a Base58Check string to a Skynet address
-* 
-* @param[i] address The Base58Check encoded string
-* @param[o] version The version of the decoded address (check consensus.hpp for more info)
-* @return std::vector<byte> The decoded address
-* @throws std::invalid_argument If the Base58Check string is invalid
-*/
-std::vector<byte> crypto::encoding::base58check::DecodeAddress(std::string address, int* version) {
-      std::vector<byte> decoded_address = Decode(address);
-      *version = decoded_address[0];
-      return std::vector<byte>(decoded_address.begin() + 1, decoded_address.end());
-}
-
 // MIT License
 // 
 // Copyright (c) 2023 João Matos
