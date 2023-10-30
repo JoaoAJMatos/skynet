@@ -42,18 +42,18 @@ namespace skynet
             /** 
              * @brief Removes a transaction from the mempool
              * 
-             * @param transaction_id The ID of the transaction to be removed
+             * @param transaction_has The hash of the transaction to be removed
              * @throws std::runtime_error If the transaction is not found
              */
-            void RemoveTransaction(TransactionID transaction_id);
+            void RemoveTransaction(TransactionHash transaction_hash);
 
             /** 
              * @brief Returns a transaction with a given ID 
              * 
-             * @param transaction_id The ID of the transaction to be returned
+             * @param transaction_hash The hash of the transaction to be returned
              * @return Transaction The transaction with the given ID
              */
-            Transaction GetTransaction(TransactionID transaction_id);
+            Transaction GetTransaction(TransactionHash transaction_hash);
 
             /** 
              * @brief Get the vector of transactions

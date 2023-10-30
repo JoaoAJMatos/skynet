@@ -24,12 +24,12 @@ void skynet::MemPool::AddTransaction(Transaction transaction) {
 * @param transaction_id The ID of the transaction to be removed
 * @throws std::runtime_error If the transaction is not found
 */
-void skynet::MemPool::RemoveTransaction(TransactionID transaction_id) {
-      TransactionID id;
+void skynet::MemPool::RemoveTransaction(TransactionHash transaction_hash) {
+      TransactionHash hash;
 
       for (auto& transaction : transactions) {
-            transaction.GetID(id);
-            if (crypto::hashing::SHA256::CompareHash(id, transaction_id)) {
+            auto hash = transaction.Hash();
+            if (crypto::hashing::SHA256::CompareHash(hash.get(), transaction_hash)) {
                   transactions.erase(std::remove(transactions.begin(), transactions.end(), transaction), transactions.end());
                   return;
             }
@@ -44,12 +44,12 @@ void skynet::MemPool::RemoveTransaction(TransactionID transaction_id) {
 * @param transaction_id The ID of the transaction to be returned
 * @return Transaction The transaction with the given ID
 */
-skynet::Transaction skynet::MemPool::GetTransaction(TransactionID transaction_id) {
-      TransactionID id;
+skynet::Transaction skynet::MemPool::GetTransaction(TransactionHash transaction_hash) {
+      TransactionHash hash;
 
       for (auto& transaction : transactions) {
-            transaction.GetID(id);
-            if (crypto::hashing::SHA256::CompareHash(id, transaction_id)) {
+            auto hash = transaction.Hash();
+            if (crypto::hashing::SHA256::CompareHash(hash.get(), transaction_hash)) {
                   return transaction;
             }
       }
