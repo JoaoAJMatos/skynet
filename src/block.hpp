@@ -61,6 +61,18 @@ namespace skynet
                   difficultyTarget = header.difficultyTarget;
                   nonce = header.nonce;
             }
+
+            BlockHeader &operator=(const BlockHeader &header) {
+                  version = header.version;
+                  prevHash = std::make_unique<byte[]>(crypto::hashing::SHA256_HASH_SIZE);
+                  std::copy(header.prevHash.get(), header.prevHash.get() + crypto::hashing::SHA256_HASH_SIZE, prevHash.get());
+                  merkleRoot = std::make_unique<byte[]>(crypto::hashing::SHA256_HASH_SIZE);
+                  std::copy(header.merkleRoot.get(), header.merkleRoot.get() + crypto::hashing::SHA256_HASH_SIZE, merkleRoot.get());
+                  timestamp = header.timestamp;
+                  difficultyTarget = header.difficultyTarget;
+                  nonce = header.nonce;
+                  return *this;
+            }
       };
 
       class Block
@@ -69,7 +81,6 @@ namespace skynet
             Block();
             Block(BlockHeader header, std::vector<Transaction> transactions);
             ~Block() = default;
-
 
             /** 
              * @brief Returns the hash of the block
@@ -87,6 +98,14 @@ namespace skynet
             void AddTransaction(Transaction transaction);
 
             /** 
+             * @brief Adds a Coinbase transaction to the Block
+             * 
+             * @param minerAddress The address of the miner
+             * @throws std::runtime_error If the block is full
+             */
+            void AddCoinbaseTransaction(std::string minerAddress);
+
+            /** 
              * @brief Returns the formatted string representation of a block 
              * 
              * @return std::string The formatted string representation of a block
@@ -98,7 +117,7 @@ namespace skynet
             * 
             * @return Block The Genesis block
             */
-            static Block GenesisBlock();
+            static std::unique_ptr<Block> GenesisBlock();
 
             /** Getters */
             BlockHeader GetHeader() const { return header; }

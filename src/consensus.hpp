@@ -17,6 +17,7 @@
 /** C++ Includes */
 #include <ctime>
 
+
 namespace skynet::consensus
 {
       /** [ BLOCKCHAIN ] */
@@ -27,7 +28,6 @@ namespace skynet::consensus
       /** [ MINING ] */
       constexpr int INITIAL_DIFFICULTY = 5;                /** The initial block difficulty */
       constexpr int MINING_RATE = 60;                      /** The Mining rate (blocks/hour) */
-      constexpr int INITIAL_DIFFICULTY = 1;                /** The initial block difficulty */
       constexpr int DIFFICULTY_ADJUSTMENT_INTERVAL = 2016; /** Halving frequency */
       constexpr int INITIAL_SUBSIDY = 50;                  /** The initial block subsidy */
 
@@ -69,30 +69,6 @@ namespace skynet::consensus
 
             return lastDifficulty;
       }
-
-namespace coinbase 
-{
-
-      /**
-       * @brief Creates a coinbase transaction.
-       * 
-       * @details The coinbase transaction is the first transaction in a block.
-       *          It is created by the miner and it is the only transaction that
-       *          does not have any inputs. It is used to reward the miner for
-       *          mining the block.
-       * 
-       * @return skynet::Transaction 
-       */
-      skynet::Transaction CreateCoinbaseTransaction(int height) {
-            skynet::OutputMap output_map;
-            skynet::InputMap input_map;
-
-            // TODO: Add the coinbase transaction logic
-            
-            return skynet::Transaction(input_map, output_map);
-      }
-
-} // namespace coinbase
 
 } // namespace skynet::consensus
 

@@ -6,6 +6,7 @@
 #include <time.hpp>
 #include <consensus.hpp>
 #include <merkle_tree.hpp>
+#include <crypto/random.hpp>
 
 /** Local Include */
 #include "block.hpp"
@@ -48,23 +49,22 @@ void skynet::Block::AddTransaction(Transaction transaction) {
 
 //////////////////////////////////////////////////////////////////////////////////////////////
 
-inline skynet::Block skynet::Block::GenesisBlock() {
+inline std::unique_ptr<skynet::Block> skynet::Block::GenesisBlock() {
       std::vector<Transaction> transactions;
 
-      /** Create the coinbase transaction */
-      transactions.push_back(consensus::coinbase::CreateCoinbaseTransaction(0));
-
-      return Block(
+      auto block = std::make_unique<Block>(
             BlockHeader(
                   consensus::VERSION,                                               // Version
                   std::make_unique<byte[]>(crypto::hashing::SHA256_HASH_SIZE),      // Previous hash
                   CalculateMerkleRoot(transactions),                                // Merkle root
                   util::time::timestamp(),                                          // Timestamp
                   consensus::INITIAL_DIFFICULTY,                                    // Difficulty target
-                  0                                                                 // Nonce
+                  crypto::random::randint(0, INT32_MAX)                             // Nonce
             ), 
             transactions
       );
+
+      return block;
 }
 
 //////////////////////////////////////////////////////////////////////////////////////////////
