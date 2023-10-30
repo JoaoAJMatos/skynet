@@ -114,6 +114,18 @@ namespace crypto::random
 #endif
             return 1;
       }
+
+      /**
+       * @brief Generates a random integer between two values
+       * 
+       * @param min 
+       * @param max 
+       * @return int 
+       */
+      inline int randint(int min, int max) {
+            srand(time(NULL));
+            return min + (int) (rand() / (RAND_MAX / (max - min + 1) + 1));
+      }
 } // namespace random
 
 #endif // SKYNET_RANDOM_HPP
