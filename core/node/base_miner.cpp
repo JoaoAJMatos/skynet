@@ -7,6 +7,7 @@
 
 /** Skynet Includes */
 #include <time.hpp>
+#include <transaction.hpp>
 
 /**
  * @brief Returns the list of transactions selected for being added to a block.
@@ -19,7 +20,7 @@ static std::vector<skynet::Transaction> select_transactions(skynet::MemPool &mem
 
       /** Order the transactions by fee returns */
       std::sort(mempool.begin(), mempool.end(), [](skynet::Transaction &a, skynet::Transaction &b) {
-            return a.GetFeeEarnings() > b.GetFeeEarnings();
+            return skynet::Transaction::CalculateFee(a) > skynet::Transaction::CalculateFee(b);
       });
 
       /** Pick the ones whose locktime is less than the current timestamp */
@@ -45,7 +46,7 @@ void skynet::Miner::Mine() {
       }
 
       /** Add the coinbase transaction */
-      block.AddTransaction(consensus::coinbase::CreateCoinbaseTransaction(chain->Size()));
+      block.AddCoinbaseTransaction(this->destinationAddress);
 
       /** Mine the block */
       //block.Mine();
@@ -55,9 +56,7 @@ void skynet::Miner::Mine() {
 
       /** Remove the transactions from the mempool */
       for (auto &transaction : selected_transactions) {
-            TransactionID id;
-            transaction.GetID(id);
-            mempool->RemoveTransaction(id);
+            mempool->RemoveTransaction(transaction.Hash().get());
       }
 }
 

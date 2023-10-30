@@ -22,6 +22,11 @@
 
 namespace skynet
 {
+      enum MinerType {
+            CPU_MINER,
+            GPU_MINER,
+      };
+
       class Miner
       {
       public:
@@ -49,11 +54,13 @@ namespace skynet
              *          It should create a block, add transactions to it, mine it and
              *          call the callback function with the mined block.
              */
-            virtual void Mine();
+            void Mine() = 0;
       private:
-            std::shared_ptr<MemPool> mempool;
-            std::shared_ptr<Chain> chain;
-            std::function<void(Block)> callback;
+            std::shared_ptr<MemPool> mempool;         /** Mempool */
+            std::shared_ptr<Chain> chain;             /** Blockchain */
+            std::function<void(Block)> callback;      /** Miner Callback. Should implement the serialization and broadcasting of the mined block */
+
+            std::string destinationAddress;           /** Destination address of the mined block */
       };
 } // namespace skynet
 

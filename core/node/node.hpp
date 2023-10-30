@@ -16,11 +16,11 @@
 #include <memory>
 
 /* Skynet Includes */
-#include <net/client.hpp>
-#include <net/server.hpp>
+#include <net/httpserver.hpp>
 
 /* Local Includes */
 #include "base_miner.hpp"
+
 
 namespace skynet
 {
@@ -29,32 +29,6 @@ namespace skynet
             FULL_NODE,
             LIGHT_NODE, 
             MINER_NODE
-      };
-
-      /** TRANSPORT INTERFACES */
-      class NodeServer : public net::Server
-      {
-      };
-
-      class NodeClient : public net::Client
-      {
-      };
-
-      /** NODE EXCEPTION */
-      class NodeException : public std::runtime_error
-      {
-      public:
-            NodeException(const char *message) : std::runtime_error(message) {}
-            NodeException(const std::string &message) : std::runtime_error(message) {}
-            virtual ~NodeException() {}
-
-            virtual const char *what() const noexcept override
-            {
-                  return std::runtime_error::what();
-            }
-
-      private:
-            std::string message;
       };
 
       /** NODE CLASS */
@@ -71,10 +45,13 @@ namespace skynet
 
             /** Getters */
             [[nodiscard]] NodeType GetType() const { return type; }
-            [[nodiscard]] std::shared_ptr<Miner> GetMiner() const { return miner; }
 
             /** Setters */
-            void SetMiner(std::shared_ptr<Miner> miner) { this->miner = miner; }
+            template <typename T>
+            void SetMiner(std::shared_ptr<MemPool> mempool, std::shared_ptr<Chain> chain, std::function<void(Block)> callback)
+            {
+                  miner = std::make_unique<T>(mempool, chain, callback);
+            }
       private:
             /** Bootstrap the node */
             void Bootstrap();
@@ -93,10 +70,9 @@ namespace skynet
 
             NodeType type;
             
-            std::unique_ptr<NodeServer> server;
-            std::unique_ptr<NodeClient> client;
-
-            std::shared_ptr<Miner> miner;
+            /** TRANSPORT INTERFACES */
+            std::unique_ptr<net::HTTPServer> http_server;
+            std::unique_ptr<Miner> miner;
       };
 } // namespace skynet
 
