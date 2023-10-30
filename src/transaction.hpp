@@ -35,17 +35,26 @@ namespace skynet
        */
       struct TransactionInput
       {
-            byte prevTransactionOutput[crypto::hashing::SHA256_HASH_SIZE]; /** The hash of the previous transaction's output (TXID) */
-            int prevTransactionOutputIndex;                                /** The index of the previous transaction's output (VOUT) */
-            crypto::ecdsa::PublicKey sender;                               /** The sender's wallet address */
-            crypto::ecdsa::Signature signature;                            /** The signature of the sender */
+            TransactionHash prevTransactionOutput;        /** The hash of the previous transaction's output (TXID) */
+            int prevTransactionOutputIndex;               /** The index of the previous transaction's output (VOUT) */
+            crypto::ecdsa::PublicKey sender;              /** The sender's wallet address */
+            crypto::ecdsa::Signature signature;           /** The signature of the sender */
+            int sequence;                                 /** The sequence number */
 
-            TransactionInput(byte prevTransactionOutput[crypto::hashing::SHA256_HASH_SIZE], int prevTransactionOutputIndex, crypto::ecdsa::PublicKey sender, crypto::ecdsa::Signature signature)
+            /** Constructor */
+            TransactionInput(
+                  byte prevTransactionOutput[crypto::hashing::SHA256_HASH_SIZE], 
+                  int prevTransactionOutputIndex, 
+                  crypto::ecdsa::PublicKey sender, 
+                  crypto::ecdsa::Signature signature,
+                  int sequence
+            ) 
             {
                   memcpy(this->prevTransactionOutput, prevTransactionOutput, crypto::hashing::SHA256_HASH_SIZE);
                   this->prevTransactionOutputIndex = prevTransactionOutputIndex;
                   memcpy(this->sender, sender, crypto::ecdsa::COMPRESSED_PUBLIC_KEY_SIZE);
                   memcpy(this->signature, signature, crypto::ecdsa::SERIALIZED_SIGNATURE_SIZE);
+                  this->sequence = sequence;
             }
       };
 
@@ -54,10 +63,9 @@ namespace skynet
             int value;                                          /** The amount of coins to be sent */
             crypto::ecdsa::PublicKey recipient;                 /** The recipients wallet address */
 
-            TransactionOutput(int value, crypto::ecdsa::PublicKey recipient)
-            {
+            TransactionOutput(int value, crypto::ecdsa::PublicKey recipient) {
                   this->value = value;
-                  this->recipient = recipient;
+                  memcpy(this->recipient, recipient, crypto::ecdsa::COMPRESSED_PUBLIC_KEY_SIZE);
             }
       };
 
@@ -68,7 +76,7 @@ namespace skynet
       class Transaction
       {
       public:
-            Transaction(InputMap input_map, OutputMap output_map);
+            Transaction(TransactionInput input, TransactionOutput output);
             ~Transaction();
 
             /**
@@ -79,6 +87,21 @@ namespace skynet
              * @return false 
              */
             bool IsValid();
+ 
+            /**
+             * @brief Returns the hash of the transaction
+             * 
+             * @return std::unique_ptr<byte[]> 
+             */
+            std::unique_ptr<byte[]> Hash() const;
+            
+            /**
+             * @brief Calculates the fee earnings of the miner
+             * 
+             * @param transaction
+             * @return int 
+             */
+            static int CalculateFee(Transaction transaction);
 
             /**
              * @brief Returns the formatted string representation of a transaction
@@ -87,37 +110,22 @@ namespace skynet
              */
             std::string ToString() const;
 
-            /**
-             * @brief Returns the hash of the transaction
-             * 
-             * @return std::unique_ptr<byte[]> 
-             */
-            std::unique_ptr<byte[]> Hash() const;
+            /** Operators */
+            bool operator==(const Transaction &transaction) const;
+            bool operator!=(const Transaction &transaction) const;
 
             /** Getters */
-            [[nodiscard]] InputMap GetInputMap() const { return input_map; }
-            [[nodiscard]] OutputMap GetOutputMap() const { return output_map; }
-            void GetID(byte *id) { memcpy(id, this->id, crypto::hashing::SHA256_HASH_SIZE); }
+            [[nodiscard]] TransactionInput GetInput() const { return input; }
+            [[nodiscard]] TransactionOutput GetOutput() const { return output; }
             [[nodiscard]] time_t GetLocktime() const { return locktime; }
             [[nodiscard]] float GetVersion() const { return version; }
-            [[nodiscard]] float GetFee() const { return fee; }
-
-            /**
-             * @brief Calculates the fee earnings of the miner
-             * 
-             * @return int 
-             */
-            int GetFeeEarnings();
-
+            
       private:
-            time_t timestamp;                                    /** The timestamp of the transaction */
-            InputMap input_map;
-            OutputMap output_map;
-
-            TransactionID id;
-            time_t locktime;
-            float version;
-            float fee;
+            time_t timestamp;             /** The timestamp of the transaction */
+            TransactionInput input;       /** The input of the transaction */
+            TransactionOutput output;     /** The output of the transaction */
+            time_t locktime;              /** The time when the transaction can be added to a block */
+            float version;                /** The version of the protocol when the transaction was created */
       };
 }
 
