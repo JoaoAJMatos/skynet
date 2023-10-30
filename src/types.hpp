@@ -5,8 +5,8 @@
 #ifndef SKYNET_TYPES_HPP
 #define SKYNET_TYPES_HPP
 
-typedef unsigned char byte;
-typedef unsigned int  word;
-typedef unsigned char uuid[16];
+using byte = unsigned char;
+using word = unsigned int;
+using uuid = unsigned char[16];
 
 #endif //SKYNET_TYPES_HPP
