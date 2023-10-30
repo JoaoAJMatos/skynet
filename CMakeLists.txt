@@ -28,11 +28,11 @@ add_library(secp256k1 SHARED IMPORTED)
 # Include different libraries depending on the OS
 if(APPLE)
       set(CMAKE_CXX_COMPILER "/usr/bin/clang++")
-      set_target_properties(secp256k1 PROPERTIES IMPORTED_LOCATION "${PROJECT_SOURCE_DIR}/lib/libsecp256k1.2.dylib")
+      set_target_properties(secp256k1 PROPERTIES IMPORTED_LOCATION "${PROJECT_SOURCE_DIR}/lib/secp256k1/libsecp256k1.2.dylib")
 elseif(UNIX AND NOT APPLE)
-      set_target_properties(secp256k1 PROPERTIES IMPORTED_LOCATION "${PROJECT_SOURCE_DIR}/lib/libsecp256k1.so.2")
+      set_target_properties(secp256k1 PROPERTIES IMPORTED_LOCATION "${PROJECT_SOURCE_DIR}/lib/secp256k1/libsecp256k1.so.2")
 elseif(WIN32)
-      set_target_properties(secp256k1 PROPERTIES IMPORTED_LOCATION "${PROJECT_SOURCE_DIR}/lib/libsecp256k1.dll")
+      set_target_properties(secp256k1 PROPERTIES IMPORTED_LOCATION "${PROJECT_SOURCE_DIR}/lib/secp256k1/libsecp256k1.dll")
 endif()
 
 # Link library dependencies
