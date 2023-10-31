@@ -19,14 +19,33 @@
 
 /** C++ Includes */
 #include <vector>
+#include <memory>
+#include <stdexcept>
 
 /** Skynet Includes */
 #include <types.hpp>
 #include <block.hpp>
 #include <consensus.hpp>
+#include <mempool.hpp>
 
 namespace skynet
 {
+      class ChainException : public std::runtime_error
+      {
+      public:
+            explicit ChainException(const std::string& message) : std::runtime_error(message) {}
+            explicit ChainException(const char* message) : std::runtime_error(message) {}
+
+            ~ChainException() override = default;
+
+            [[nodiscard]] const char* what() const noexcept override {
+                  return std::runtime_error::what();
+            }
+
+      private:
+            std::string message;
+      };
+
       class Chain
       {
       public:
@@ -35,7 +54,7 @@ namespace skynet
 
             /* BLOCKCHAIN OPERATIONS */
             /** Adds a block to the Blockchain */
-            void AddBlock(Block block);
+            void AddBlock(const Block& block);
 
             /* BLOCKCHAIN VALIDATION */
             /** Validates the Blockchain */
@@ -45,13 +64,43 @@ namespace skynet
             /** Returns the Blocks in the Blockchain */
             std::vector<Block> GetBlocks();
             /** Returns the last block in the Blockchain */
-            Block GetLastBlock();
+            [[nodiscard]] Block GetLastBlock() const { return *this->blocks.back(); }
             /** Returns the size of the Blockchain */
-            int Size();
+            [[nodiscard]] std::size_t Size() const { return this->blocks.size(); }
 
       private:
             std::string name;
-            std::vector<std::unique_ptr<Block>> blocks;
+            std::vector<std::unique_ptr<Block>> blocks;     /** Main chain */
+            std::vector<std::unique_ptr<Block>> orphans;    /** Orphan blocks */
+            std::shared_ptr<MemPool> mempool;               /** Memory pool */
+
+            /**
+            * @brief Checks if a block is valid given the last block in the chain
+            *
+            * @param lastBlock
+            * @param newBlock
+            * @return
+            */
+            bool BlockHasExpectedHeightAndExtendsMainChain(const Block& newBlock) const;
+
+            bool BlockHasExpectedHeight(const Block& newBlock) const;
+            bool BlockExtendsMainChain(const Block& newBlock) const;
+
+            /**
+            * @brief Checks if the given block creates a valid fork in the blockchain
+            *
+            * @param blockchain
+            * @param block
+            * @return
+            */
+            [[nodiscard]] bool BlockIsFork(const Block& block) const;
+
+            /**
+             * @brief Handles the fork resolution
+             *
+             * @param block
+             */
+            void HandleForkResolution(const Block& block);
 
             /* BLOCKCHAIN FILES */
             /** Load a Blockchain from a file */
@@ -59,6 +108,7 @@ namespace skynet
             /** Saves the Blockchain to a file */
             void SaveChain(std::string file_path);
       };
+
 } // namespace skynet
 
 #endif // SKYNET_BLOCKCHAIN_HPP
