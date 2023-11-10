@@ -36,6 +36,7 @@
 
 /** Skynet Includes */
 #include <net/server.hpp>
+#include <utility>
 
 namespace net
 {
@@ -89,7 +90,7 @@ namespace net
        * @param method The string representation of the HTTP method.
        * @return HTTPMethod The HTTP method.
        */
-      HTTPMethod StringToHTTPMethod(std::string method);
+      HTTPMethod StringToHTTPMethod(const std::string& method);
 
       /**
        * @brief Returns the string representation of a HTTP status code.
@@ -99,16 +100,23 @@ namespace net
        */
       std::string HTTPStatusCodeMessage(HTTPStatusCode status_code);
 
+      /** An HTTP handler */
+      struct http_handler {
+            std::string path;
+            HTTPMethod method;
+            std::function<HTTPResponse(HTTPRequest)> handler;
+      };
+
       /**
        * @brief HTTP Exception
        */
       class HTTPException : public std::runtime_error
       {
       public:
-            HTTPException(HTTPStatusCode status_code, std::string message) : 
+            HTTPException(HTTPStatusCode status_code, const std::string& message) :
                   std::runtime_error(message), status_code(status_code) {}
 
-            HTTPStatusCode GetStatusCode() const { return this->status_code; }
+            [[nodiscard]] HTTPStatusCode GetStatusCode() const { return this->status_code; }
       
       private:
             HTTPStatusCode status_code;
@@ -124,19 +132,19 @@ namespace net
             ~HTTPRequest() = default;
 
             HTTPRequest(HTTPMethod method, std::string path, std::string body, std::map<std::string, std::string> headers) : 
-                  method(method), path(path), body(body), headers(headers) {}
+                  method(method), path(std::move(path)), body(std::move(body)), headers(std::move(headers)) {}
 
             HTTPRequest(const HTTPRequest& other) : 
                   method(other.method), path(other.path), body(other.body), headers(other.headers) {}
 
             /** Converts the HTTP Request to a string */
-            std::string ToString() const;
+            [[nodiscard]] std::string ToString() const;
 
             /** Getters */
-            HTTPMethod GetMethod() const { return this->method; }
-            std::string GetPath() const { return this->path; }
-            std::string GetBody() const { return this->body; }
-            std::map<std::string, std::string> GetHeaders() const { return this->headers; }
+            [[nodiscard]] HTTPMethod GetMethod() const { return this->method; }
+            [[nodiscard]] std::string GetPath() const { return this->path; }
+            [[nodiscard]] std::string GetBody() const { return this->body; }
+            [[nodiscard]] std::map<std::string, std::string> GetHeaders() const { return this->headers; }
 
       private:
             HTTPMethod method;
@@ -155,24 +163,24 @@ namespace net
             ~HTTPResponse() = default;
 
             HTTPResponse(HTTPStatusCode status_code, std::string body, std::map<std::string, std::string> headers) : 
-                  status_code(status_code), body(body), headers(headers) {}
+                  status_code(status_code), body(std::move(body)), headers(std::move(headers)) {}
             
             HTTPResponse(const HTTPResponse& other) :
                   status_code(other.status_code), body(other.body), headers(other.headers) {}
 
             /** Converts the HTTP Response to a string */
-            std::string ToString() const;
+            [[nodiscard]] std::string ToString() const;
 
             /** Getters */
-            HTTPStatusCode GetStatusCode() const { return static_cast<HTTPStatusCode>(this->status_code); }
-            std::string GetBody() const { return this->body; }
-            std::map<std::string, std::string> GetHeaders() const { return this->headers; }
+            [[nodiscard]] HTTPStatusCode GetStatusCode() const { return static_cast<HTTPStatusCode>(this->status_code); }
+            [[nodiscard]] std::string GetBody() const { return this->body; }
+            [[nodiscard]] std::map<std::string, std::string> GetHeaders() const { return this->headers; }
 
       private:
             HTTPStatusCode status_code;
             std::string body;
             std::map<std::string, std::string> headers;
-      };
+      }; 
 
       /**
        * @brief HTTP Server
@@ -189,7 +197,7 @@ namespace net
             ~HTTPServer() = default;
 
             /** Registers a handler for a given path */
-            void RegisterHandler(std::string path, std::function<HTTPResponse(HTTPRequest)> handler);
+            void RegisterHandler(const std::string& path, HTTPMethod method, std::function<HTTPResponse(HTTPRequest)> handler);
 
       private:
             /** Function Overrides */
@@ -200,8 +208,8 @@ namespace net
             /** Handles a request */
             void HandleRequest(std::string data);
 
-            /** HTTP handlers map */
-            std::map<std::string, std::function<HTTPResponse(HTTPRequest)>> handlers;
+            /** HTTP handlers */
+            std::vector<http_handler> handlers;
       };
 
 } // namespace net

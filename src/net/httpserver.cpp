@@ -5,6 +5,8 @@
 /** C++ Includes */
 #if not defined(_WIN32) && not defined(_WIN64)
 #include <arpa/inet.h>  // for inet_ntoa()
+
+#include <utility>
 #endif // not defined(_WIN32) && not defined(_WIN64)
 
 /** Local Includes */
@@ -20,7 +22,7 @@
  * @param delimiter The delimiter to use.
  * @return std::vector<std::string> The vector of strings.
  */
-static std::vector<std::string> split(std::string str, std::string delimiter) {
+static std::vector<std::string> split(std::string str, const std::string& delimiter) {
       std::vector<std::string> result;
       size_t pos = 0;
       std::string token;
@@ -41,7 +43,7 @@ static std::vector<std::string> split(std::string str, std::string delimiter) {
  */
 static net::HTTPRequest parse_http_request(std::string request_string) {
       /** Split the request into lines */
-      std::vector<std::string> lines = split(request_string, "\r\n");
+      std::vector<std::string> lines = split(std::move(request_string), "\r\n");
 
       /** Parse the request line */
       std::vector<std::string> request_line = split(lines[0], " ");
@@ -56,20 +58,20 @@ static net::HTTPRequest parse_http_request(std::string request_string) {
       }
 
       /** Parse the body */
-      std::string body = "";
+      std::string body;
       if (headers.find("Content-Length") != headers.end()) {
             int content_length = std::stoi(headers["Content-Length"]);
             body = lines[lines.size() - 1].substr(0, content_length);
       }
 
       /** Return the request */
-      return net::HTTPRequest(net::StringToHTTPMethod(method), path, body, headers);
+      return {net::StringToHTTPMethod(method), path, body, headers};
 }
 
 //////////////////////////////////////////////////////////////////////////////////////////////
 
 std::string net::HTTPRequest::ToString() const {
-      std::string result = "";
+      std::string result;
       result += net::HTTPMethodToString(this->method) + " " + this->path + " HTTP/1.1\r\n";
       for (auto& header : this->headers) {
             result += header.first + ": " + header.second + "\r\n";
@@ -80,7 +82,7 @@ std::string net::HTTPRequest::ToString() const {
 }
 
 std::string net::HTTPResponse::ToString() const {
-      std::string result = "";
+      std::string result;
       result += "HTTP/1.1 " + std::to_string((int)this->status_code) + " " + net::HTTPStatusCodeMessage(this->status_code) + "\r\n";
       for (auto& header : this->headers) {
             result += header.first + ": " + header.second + "\r\n";
@@ -110,6 +112,8 @@ std::string net::HTTPMethodToString(HTTPMethod method) {
       case HTTPMethod::OPTIONS: return "OPTIONS";
       case HTTPMethod::CONNECT: return "CONNECT";
       case HTTPMethod::TRACE: return "TRACE";
+          case HTTPMethod::PATCH:
+              break;
       } // No default case to force compiler warning on missing cases
 
       return "";
@@ -122,7 +126,7 @@ std::string net::HTTPMethodToString(HTTPMethod method) {
  * @return HTTPMethod The HTTP method.
  * @throws std::runtime_error If the method is invalid.
  */
-net::HTTPMethod net::StringToHTTPMethod(std::string method) {
+net::HTTPMethod net::StringToHTTPMethod(const std::string& method) {
       if (method == "GET") return HTTPMethod::GET;
       if (method == "POST") return HTTPMethod::POST;
       if (method == "PUT") return HTTPMethod::PUT;
@@ -170,8 +174,8 @@ std::string net::HTTPStatusCodeMessage(HTTPStatusCode status_code) {
  * @param path The path to register the handler for.
  * @param handler The handler to register.
  */
-void net::HTTPServer::RegisterHandler(std::string path, std::function<HTTPResponse(HTTPRequest)> handler) {
-      this->handlers[path] = handler;
+void net::HTTPServer::RegisterHandler(const std::string& path, std::function<HTTPResponse(HTTPRequest)> handler) {
+      this->handlers[path] = std::move(handler);
 }
 
 /**
@@ -201,7 +205,7 @@ void net::HTTPServer::Launch() {
  * @see net::Server::Run
  */
 void net::HTTPServer::Accept() {
-      struct sockaddr_in client_address;
+      struct sockaddr_in client_address{};
       socklen_t client_address_size = sizeof(client_address);
 
       /** Accept the connection */
@@ -213,9 +217,9 @@ void net::HTTPServer::Accept() {
       uint16_t client_port = ntohs(client_address.sin_port);
 
       /** Read data from the socket */
-      std::string data = "";
+      std::string data;
       char buffer[1024];
-      int bytes_read = 0;
+      std::size_t bytes_read = 0;
       while ((bytes_read = recv(client_socket, buffer, sizeof(buffer), 0)) > 0)
             data += std::string(buffer, bytes_read);
       
@@ -237,25 +241,36 @@ void net::HTTPServer::HandleRequest(std::string request) {
       HTTPResponse http_response;
       
       try {
-            /** Parse the request */
-            HTTPRequest http_request = parse_http_request(request);
+            /** Parse the request & get the handler */
+            HTTPRequest http_request = parse_http_request(std::move(request));
+            std::function<HTTPResponse(HTTPRequest)> handler = GetHTTPHandler(http_request.GetPath(), http_request.GetMethod());
 
-            /** Get the handler */
-            std::function<HTTPResponse(HTTPRequest)> handler = this->handlers[http_request.GetPath()];
-
-            if (handler == nullptr) 
-                  http_response = HTTPResponse(HTTPStatusCode::NOT_FOUND, "Not Found", {});
-            else 
-                  http_response = handler(http_request);
-
+            /** Call the handler or send a 404 response */
+            if (handler == nullptr) http_response = HTTPResponse(HTTPStatusCode::NOT_FOUND, "Not Found", {});
+            else http_response = handler(http_request);
+                  
       } catch (HTTPException &e) {
-            HTTPStatusCode status_code = e.GetStatusCode();
-            http_response = HTTPResponse(status_code, HTTPStatusCodeMessage(status_code), {});
+            http_response = HTTPResponse(status_code, HTTPStatusCodeMessage(e.GetStatusCode()), {});
       } catch (std::exception &e) {
             http_response = HTTPResponse(HTTPStatusCode::INTERNAL_SERVER_ERROR, e.what(), {});
       }
 
-      send(this->GetSocket(), http_response.ToString().c_str(), http_response.ToString().length(), 0);
+      send(GetSocket(), http_response.ToString().c_str(), http_response.ToString().length(), 0);
+}
+
+/**
+ * @brief Returns the handler to the given path and method.
+ *
+ * @param path The path to get the handler for.
+ * @param method The method to get the handler for.
+ *
+ * @return std::function<HTTPResponse(HTTPRequest)> The handler for the given path and method.
+ */
+std::function<net::HTTPResponse(HTTPRequest)> GetHTTPHandler(std::string path, net::HTTPMethod method) {
+      for (auto& handler : handlers) {
+            if (handler.path == path && handler.method == method)
+                  return handler.handler;
+      }
 }
 
 // MIT License
